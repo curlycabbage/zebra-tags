@@ -2,6 +2,16 @@
   "name": "zebra-tags",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Peter Radocchia"
+  },
+  "bugs": {
+    "url": "https://github.com/curlycabbage/zebra-tags/issues"
+  },
+  "keywords": [
+    "vue", "zpl", "zebra"
+  ],
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

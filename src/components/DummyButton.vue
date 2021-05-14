@@ -11,7 +11,7 @@ export default {
   data() {
     return {
       count: this.initialValue,
-    }
+    };
   },
   computed: {
     times() {
