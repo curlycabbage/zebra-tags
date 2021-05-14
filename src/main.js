@@ -1,2 +1,2 @@
-import DummyButton from "./components/DummyButton.vue";
-export default DummyButton;
+import ShelfTag200x125 from "./components/ShelfTag200x125.vue";
+export { ShelfTag200x125 };

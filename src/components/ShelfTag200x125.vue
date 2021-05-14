@@ -4,8 +4,6 @@
 </template>
 
 <style lang="postcss" scoped>
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap");
-
 .shelf-tag {
   border: dotted 1px grey;
   height: 1.25in;
@@ -28,6 +26,7 @@ export default {
     isWeighed: Boolean,
     price: Number,
     dpmm: { type: Number, default: 12 },
+    renderCanvas: Boolean,
   },
   data() {
     const dpi = Math.floor(this.dpmm * 25.4);
@@ -55,7 +54,6 @@ export default {
 
       /** something to approximate the scalable Zebra font 0 */
       fontFamily: "sans-serif",
-      // fontFamily: "'Roboto Condensed'",
     };
   },
   computed: {
