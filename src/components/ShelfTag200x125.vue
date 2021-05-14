@@ -3,7 +3,7 @@
   </canvas>
 </template>
 
-<style lang="postcss" scoped>
+<style lang="css" scoped>
 .shelf-tag {
   border: dotted 1px grey;
   height: 1.25in;
@@ -12,7 +12,7 @@
 </style>
 
 <script>
-import { computeUnitCost, sanitize } from "../utils";
+import { computeUnitCost, sanitize } from "./utils";
 
 /** golden ratio */
 const gr = 1.618;
