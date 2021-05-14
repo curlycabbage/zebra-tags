@@ -9,7 +9,9 @@
     "url": "https://github.com/curlycabbage/zebra-tags/issues"
   },
   "keywords": [
-    "vue", "zpl", "zebra"
+    "vue",
+    "zpl",
+    "zebra"
   ],
   "license": "MIT",
   "scripts": {
@@ -20,19 +22,19 @@
   },
   "main": "./dist/zebra-tags.common.js",
   "dependencies": {
-    "core-js": "^3.6.5",
+    "core-js": "^3.12.1",
     "vue": "^2.6.11"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "^4.5.12",
-    "@vue/cli-service": "~4.5.0",
+    "@vue/cli-plugin-babel": "^4.5.13",
+    "@vue/cli-plugin-eslint": "^4.5.13",
+    "@vue/cli-service": "^4.5.13",
     "@vue/eslint-config-prettier": "^6.0.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
+    "eslint": "^7.26.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^6.2.2",
-    "prettier": "^2.2.1",
+    "eslint-plugin-vue": "^7.9.0",
+    "prettier": "^2.3.0",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
