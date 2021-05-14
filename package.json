@@ -1,9 +1,13 @@
 {
   "name": "zebra-tags",
   "version": "0.1.0",
-  "private": true,
   "author": {
     "name": "Peter Radocchia"
+  },
+  "homepage": "https://github.com/curlycabbage/zebra-tags#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/curlycabbage/zebra-tags.git"
   },
   "bugs": {
     "url": "https://github.com/curlycabbage/zebra-tags/issues"
