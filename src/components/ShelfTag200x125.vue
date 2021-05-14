@@ -1,94 +1,149 @@
 <template>
-  <canvas class="shelf-tag" ref="canvas" :width="width" :height="height">
-  </canvas>
+  <div>
+    <canvas
+      v-show="mode === 'canvas'"
+      class="canvas"
+      :style="backgroundColor ? `background-color: ${backgroundColor}` : ''"
+      ref="canvas"
+      :width="width"
+      :height="height"
+    />
+    <labelary-tag-200x-125
+      v-if="mode === 'labelary'"
+      :zpl="zpl"
+      :dpmm="dpmm"
+      :backgroundColor="backgroundColor"
+    />
+  </div>
 </template>
 
 <style lang="css" scoped>
-.shelf-tag {
-  border: dotted 1px grey;
+.canvas {
   height: 1.25in;
   width: 2in;
+  display: block;
 }
 </style>
 
 <script>
 import { computeUnitCost, sanitize } from "./utils";
+import LabelaryTag200x125 from "./LabelaryTag200x125.vue";
 
 /** golden ratio */
 const gr = 1.618;
 
 export default {
+  name: "ShelfTag200x125",
+  components: { LabelaryTag200x125 },
   props: {
     productCode: String,
-    brand: String,
+    brandName: String,
     description: String,
     itemSize: String,
+    retailPrice: Number,
     isWeighed: Boolean,
-    price: Number,
+    isTaxed: Boolean,
+    isOrganic: Boolean,
+    /** dots per millimeter, only 12 works at the moment. */
     dpmm: { type: Number, default: 12 },
-    renderCanvas: Boolean,
+    mode: { type: String, default: "canvas" },
+    backgroundColor: String,
   },
   data() {
-    const dpi = Math.floor(this.dpmm * 25.4);
     return {
-      // key dimensions in pixels, converted to DPI
-      /** overall width */
-      width: Math.round((192 / 96) * dpi),
-      /** overall height */
-      height: Math.round((120 / 96) * dpi),
-
-      /** horizontal rule 1 */
-      hr1: Math.round((44 / 96) * dpi),
-      /** horizontal rule 2 */
-      hr2: Math.round((84 / 96) * dpi),
-
-      /** vertical rule 2 */
-      vr2: Math.round((192 / gr / 96) * dpi),
-      /** horizonal margin */
-      hm: Math.round((192 / gr ** 7 / 96) * dpi),
-      /** vertical margin */
-      vm: Math.round((120 / gr ** 7 / 96) * dpi),
-
-      /** width of dividing lines */
-      lineWidth: 3,
-
-      /** something to approximate the scalable Zebra font 0 */
-      fontFamily: "sans-serif",
+      /** the computed zpl */
+      zpl: undefined,
     };
   },
-  computed: {
-    /** size of vertical gap used above first line */
-    vr1gap() {
-      const h = this.hr1;
-      return Math.round(h / gr ** 5);
-    },
-    /** size of vertical gap used between first and second lines */
-    vr2gap() {
-      const h = this.hr2 - this.hr1;
-      return Math.round((h - h / gr) / 2);
-    },
-  },
   mounted() {
-    const { width, height, hr1, hr2, vr2, hm, vm, vr1gap, vr2gap } = this;
-    console.log({ width, height, hr1, hr2, vr2, hm, vm, vr1gap, vr2gap });
     this.$watch(
       (vm) => [
-        vm.brand,
+        vm.productCode,
+        vm.brandName,
         vm.description,
         vm.itemSize,
+        vm.retailPrice,
         vm.isWeighed,
-        vm.price,
-        vm.productCode,
+        vm.isTaxed,
+        vm.isOrganic,
+        vm.dpmm,
+        vm.fontFamily,
+        vm.lineWidth,
+        vm.backgroundColor,
       ],
       () => {
         this.drawTag();
-        this.computeZpl();
+        this.zpl = this.computeZpl();
       },
       {
         immediate: true,
         deep: true,
       }
     );
+  },
+  computed: {
+    /** dots per inch, converted from dpmm */
+    dpi() {
+      return Math.floor(this.dpmm * 25.4);
+    },
+
+    // key dimensions in pixels, converted to DPI
+    /** overall width */
+    width() {
+      return Math.round((192 / 96) * this.dpi);
+    },
+
+    /** overall height */
+    height() {
+      return Math.round((120 / 96) * this.dpi);
+    },
+
+    /** horizontal rule 1 */
+    hr1() {
+      return Math.round((44 / 96) * this.dpi);
+    },
+
+    /** horizontal rule 2 */
+    hr2() {
+      return Math.round((84 / 96) * this.dpi);
+    },
+
+    /** vertical rule 2 */
+    vr2() {
+      return Math.round((192 / gr / 96) * this.dpi);
+    },
+
+    /** horizonal margin */
+    hm() {
+      return Math.round((192 / gr ** 7 / 96) * this.dpi);
+    },
+
+    /** vertical margin */
+    vm() {
+      return Math.round((120 / gr ** 7 / 96) * this.dpi);
+    },
+
+    /** width of dividing lines */
+    lineWidth() {
+      return 3;
+    },
+
+    /** something to approximate the scalable Zebra font 0 */
+    fontFamily() {
+      return "sans-serif";
+    },
+
+    /** size of vertical gap used above first line */
+    vr1gap() {
+      const h = this.hr1;
+      return Math.round(h / gr ** 5);
+    },
+
+    /** size of vertical gap used between first and second lines */
+    vr2gap() {
+      const h = this.hr2 - this.hr1;
+      return Math.round((h - h / gr) / 2);
+    },
   },
   methods: {
     createFont(fontSize) {
@@ -102,40 +157,48 @@ export default {
       const hm = 1;
 
       const productCode = sanitize(this.productCode);
-      const brand = sanitize(this.brand);
+      const brandName = sanitize(this.brandName);
       const description = sanitize(this.description);
       const itemSize = sanitize(this.itemSize);
       const isWeighed = this.isWeighed ? true : false;
-      const price = this.price;
+      const isTaxed = this.isTaxed ? true : false;
+      const isOrganic = this.isOrganic ? true : false;
+      const retailPrice = this.retailPrice;
 
       const { units, unitCount, unitCost } = computeUnitCost({
         itemSize,
-        price,
+        price: retailPrice,
         isWeighed,
       });
 
-      const priceText = `${price.toLocaleString("en-US", {
+      const retailPriceText = retailPrice.toLocaleString("en-US", {
         style: "currency",
         currency: "USD",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })}${isWeighed ? "/LB" : ""}`;
+      });
 
-      const itemSizeText = `${unitCount} ${units}`;
-      const unitCostText = `${unitCost.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}/${units}`;
+      const itemSizeText =
+        !itemSize || isWeighed ? "" : `${unitCount} ${units}`;
+
+      const unitCostText = !itemSize
+        ? ""
+        : isWeighed
+        ? "/ LB"
+        : `${unitCost.toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}/${units}`;
 
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext("2d");
 
-      const deriveMetrics = (value, maxWidth, maxFontSize) => {
+      const deriveMetrics = (value, { maxWidth, maxFontSize, minFontSize }) => {
         ctx.save();
         const max = maxFontSize || 72;
-        const min = 42;
+        const min = minFontSize || 42;
         let fontSize = max;
         let metrics;
         for (;;) {
@@ -153,8 +216,6 @@ export default {
 
         ctx.restore();
 
-        console.log({ value, metrics });
-
         const width = metrics.width;
         const height =
           metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
@@ -170,34 +231,37 @@ export default {
           maxFontSize: 40,
           maxWidth: this.vr2 - this.hm * 2,
         },
-        brand: {
+        brandName: {
+          minFontSize: 50,
           maxWidth: this.vr2 - this.hm * 2,
         },
         description: {
           maxWidth: this.width - this.hm * 2,
         },
-        priceText: {
+        retailPriceText: {
           maxWidth: this.width - this.vr2 - this.hm * 2,
         },
         itemSizeText: {
-          maxFontSize: 54,
+          maxFontSize: 48,
           maxWidth: this.width - this.vr2 - this.hm * 2,
         },
         unitCostText: {
-          maxFontSize: 54,
+          maxFontSize: 48,
           maxWidth: this.width - this.vr2 - this.hm * 2,
         },
       };
 
       const result = {
         productCode,
-        brand,
+        brandName,
         description,
         itemSize,
         itemSizeText,
-        price,
-        priceText,
+        retailPrice,
+        retailPriceText,
         isWeighed,
+        isTaxed,
+        isOrganic,
         units,
         unitCount,
         unitCost,
@@ -210,18 +274,18 @@ export default {
       Object.keys(metrics).forEach((key) => {
         const v = result[key];
         const m = metrics[key];
-        const d = deriveMetrics(v, m.maxWidth, m.maxFontSize);
+        const d = deriveMetrics(v, m);
         Object.assign(m, d);
       });
 
-      // if brand has overflown max width, split into two lines.
-      if (metrics.brand.width > metrics.brand.maxWidth) {
-        const segments = brand.split(" ");
+      // if brandName has overflown max width, split into two lines.
+      if (metrics.brandName.width > metrics.brandName.maxWidth) {
+        const segments = brandName.split(" ");
         let brand1 = "";
-        let brand2 = brand;
+        let brand2 = brandName;
         let lastGap = 0 - ctx.measureText(brand2).width;
-        let longerValue = brand;
-        // split brand into two lines of approximately equal length
+        let longerValue = brandName;
+        // split brandName into two lines of approximately equal length
         for (let i = 0, n = segments.length; i < n; i++) {
           brand1 = segments.slice(0, i + 1).join(" ");
           brand2 = segments.slice(i + 1).join(" ");
@@ -239,22 +303,26 @@ export default {
           }
           lastGap = currGap;
         }
-        result.brand = `${brand1}\n${brand2}`;
-        const derived = deriveMetrics(longerValue, metrics.brand.maxWidth, 56);
-        Object.assign(metrics.brand, derived);
-        metrics.brand.height = metrics.brand.height * 2.3;
+        result.brandName = `${brand1}\n${brand2}`;
+        const derived = deriveMetrics(longerValue, {
+          maxWidth: metrics.brandName.maxWidth,
+          maxFontSize: 56,
+          minFontSize: metrics.brandName.minFontSize,
+        });
+        Object.assign(metrics.brandName, derived);
+        metrics.brandName.height = metrics.brandName.height * 2.3;
       }
 
       metrics.productCode.top = Math.round(
         this.hr1 - this.vr1gap - metrics.productCode.height
       );
 
-      metrics.brand.top = Math.round(
-        this.hr1 + (this.hr2 - this.hr1 - metrics.brand.height) / 2
+      metrics.brandName.top = Math.round(
+        this.hr1 + (this.hr2 - this.hr1 - metrics.brandName.height) / 2
       );
 
-      metrics.priceText.top = Math.round(
-        this.hr1 + (this.hr2 - this.hr1 - metrics.priceText.height) / 2
+      metrics.retailPriceText.top = Math.round(
+        this.hr1 + (this.hr2 - this.hr1 - metrics.retailPriceText.height) / 2
       );
 
       metrics.description.top = Math.round(this.hr2 + this.vr2gap);
@@ -271,19 +339,67 @@ export default {
           metrics.itemSizeText.height
       );
 
-      console.log(result);
+      if (isTaxed) {
+        result.isTaxedText = "+TX";
+        metrics.isTaxedText = {
+          fontSize: 24,
+          top: this.hr1 + (this.hr2 - this.hr1) / gr ** 6,
+        };
+      }
+
       return result;
+    },
+    computeRbg() {
+      const styles = window.getComputedStyle(this.$refs.canvas);
+      const color = styles && styles.backgroundColor;
+      if (color) {
+        const match = color.match(
+          /rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)/i
+        );
+        if (match) {
+          const [, r, g, b] = match;
+          return { r, g, b };
+        }
+      }
+      return { r: 255, g: 255, b: 255 };
     },
     computeZpl() {
       const {
         productCode,
-        brand,
+        brandName,
         description,
         itemSizeText,
         unitCostText,
-        priceText,
+        retailPriceText,
+        isTaxedText,
+        isOrganic,
         metrics,
       } = this.computeValues();
+
+      const { r, g, b } = this.computeRbg();
+      const backgroundZpl = `~BR0,0,${this.width},${this.height},${r},${g},${b}`;
+
+      const isOrganicZpl = !isOrganic
+        ? ""
+        : `
+^FO${this.vr2 - 25},${this.hr1 - 60}
+^GFA,350,350,7,K07FC,J07IF8,I03F003F,I0F8I07C,001CK0E,0078K078,00EL01C,01CM0E,038M07,
+07N038,06N018,0CO0C,1CO0E,180CCE7C3006,300CDB7E3803,300CDB667803,300CDC667803,
+600CCEI68018,600CC7I6C018,600CD366FC018,C00CDB76EC00C,C0079F7ECC00C,C00104L0C,CQ0C,
+:DPFEC,CPFCC,:CF842189287CC,4FA42088093CC,6F20278829FD8,6F04212821FD8,6324210029398,
+37842001083B,338DA0212C73,33OF3,19NFE6,1DNFEE,0CF7LFCC,063MF98,073KFBF38,039LFE7,
+01CLFCE,00E3EJF1C,0078JFC78,001C3IF0E,I0F80407C,I03F003F,J07IF8,K0FF8,
+^FS`;
+
+      const isTaxedZpl = !isTaxedText
+        ? ""
+        : `
+^FX isTaxed ^FS
+^FO${this.vr2},${metrics.isTaxedText.top}
+^FB${this.width - this.vr2 - this.hm},2,,R,
+^A0,${metrics.isTaxedText.fontSize}
+^FD${isTaxedText}\\&
+^FS`;
 
       const value = `^XA
 ^CI28
@@ -328,18 +444,20 @@ export default {
 ^FD${unitCostText}\\&
 ^FS
 
-^FX price ^FS
-^FO${this.vr2},${metrics.priceText.top}
+${isTaxedZpl}
+
+^FX retailPrice ^FS
+^FO${this.vr2},${metrics.retailPriceText.top}
 ^FB${this.width - this.vr2 - this.hm},2,,R,
-^A0,${metrics.priceText.fontSize}
-^FD${priceText}\\&
+^A0,${metrics.retailPriceText.fontSize}
+^FD${retailPriceText}\\&
 ^FS
 
 ^FX text1 ^FS
-^FO0,${metrics.brand.top}
+^FO0,${metrics.brandName.top}
 ^FB${this.vr2},2,,C,
-^A0,${metrics.brand.fontSize}
-^FD${brand.replace("\n", "\\&")}\\&
+^A0,${metrics.brandName.fontSize}
+^FD${brandName.replace("\n", "\\&")}\\&
 ^FS
 
 ^FX text2 ^FS
@@ -349,6 +467,10 @@ export default {
 ^FD${description}\\&
 ^FS
 
+${isOrganicZpl}
+
+${backgroundZpl}
+
 ^XZ`;
       this.$emit("zpl", value);
       return value;
@@ -356,11 +478,12 @@ export default {
     drawTag() {
       const {
         productCode,
-        brand,
+        brandName,
         description,
-        priceText,
+        retailPriceText,
         itemSizeText,
         unitCostText,
+        isTaxedText,
         metrics,
         ctx,
         canvas,
@@ -421,31 +544,49 @@ export default {
         metrics.unitCostText.top
       );
 
-      // PRICE
+      // retailPrice
 
       ctx.textBaseline = "top";
       ctx.textAlign = "right";
 
-      ctx.font = this.createFont(metrics.priceText.fontSize);
-      ctx.fillText(priceText, this.width - this.hm, metrics.priceText.top);
+      ctx.font = this.createFont(metrics.retailPriceText.fontSize);
+      ctx.fillText(
+        retailPriceText,
+        this.width - this.hm,
+        metrics.retailPriceText.top
+      );
+
+      // TAX
+
+      if (isTaxedText) {
+        ctx.textBaseline = "top";
+        ctx.textAlign = "right";
+
+        ctx.font = this.createFont(metrics.isTaxedText.fontSize);
+        ctx.fillText(
+          isTaxedText,
+          this.width - this.hm,
+          metrics.isTaxedText.top
+        );
+      }
 
       // BRAND
 
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
-      const brandLines = brand.split("\n");
+      const brandLines = brandName.split("\n");
       if (brandLines.length > 1) {
-        ctx.font = this.createFont(metrics.brand.fontSize);
-        ctx.fillText(brandLines[0], this.vr2 / 2, metrics.brand.top);
+        ctx.font = this.createFont(metrics.brandName.fontSize);
+        ctx.fillText(brandLines[0], this.vr2 / 2, metrics.brandName.top);
         ctx.fillText(
           brandLines[1],
           this.vr2 / 2,
-          metrics.brand.top + metrics.brand.height / 2
+          metrics.brandName.top + metrics.brandName.height / 2
         );
       } else {
-        ctx.font = this.createFont(metrics.brand.fontSize);
-        ctx.fillText(brand, this.vr2 / 2, metrics.brand.top);
+        ctx.font = this.createFont(metrics.brandName.fontSize);
+        ctx.fillText(brandName, this.vr2 / 2, metrics.brandName.top);
       }
 
       // DESCRIPTION

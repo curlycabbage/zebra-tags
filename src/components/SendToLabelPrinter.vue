@@ -1,10 +1,12 @@
 <template>
-  <button @click.stop="sendToPrinter()">
+  <button @click.stop="print">
     <span>{{ label }}</span>
   </button>
 </template>
 
 <script>
+import { sendToPrinter } from "./utils";
+
 export default {
   props: {
     printerUrl: String,
@@ -12,26 +14,11 @@ export default {
     zpl: String,
   },
   methods: {
-    async sendToPrinter() {
-      const headers = new Headers();
-      headers.append("Content-Type", "text/plain");
-
-      const options = {
-        method: "POST",
-        headers: headers,
-        body: this.zpl,
-        redirect: "follow",
-        // Without a proxy, this is the best we can do.
-        // The response, including the status code, will be opaque.
-        mode: "no-cors",
-      };
-
+    async print() {
       try {
-        const res = await fetch(this.printerUrl, options);
-        await res.text();
+        await sendToPrinter(this.printerUrl, this.zpl);
         this.$emit("success");
       } catch (err) {
-        console.log("Error sending label to printer", err);
         this.$emit("error", err);
       }
     },

@@ -1,34 +1,73 @@
 <template>
   <div class="flex gap-4">
     <div class="flex flex-col gap-4">
-      <shelf-tag
-        :productCode="productCode"
-        :brand="brand"
-        :description="description"
-        :price="price"
-        :itemSize="itemSize"
-        @zpl="zpl = $event"
-      />
+      <div>
+        <shelf-tag
+          class="border border-dotted"
+          :productCode="productCode"
+          :brandName="brandName"
+          :description="description"
+          :retailPrice="retailPrice"
+          :itemSize="itemSize"
+          :isWeighed="isWeighed"
+          :isTaxed="isTaxed"
+          :isOrganic="isOrganic"
+          :mode="mode"
+          :dpmm="dpmm"
+          :backgroundColor="backgroundColor"
+          @zpl="zpl = $event"
+        />
+      </div>
       <form @submit.prevent class="flex flex-col gap-4">
-        <div>
-          <input class="text-base" v-model.trim="productCode" />
+        <div class="flex justify-between">
+          <select class="text-base font-sans" v-model.trim="mode">
+            <option>canvas</option>
+            <option>labelary</option>
+          </select>
+          <select class="text-base font-sans" v-model.trim="dpmm">
+            <option :value="6">6 dpmm</option>
+            <option :value="8">8 dpmm</option>
+            <option :value="12">12 dpmm</option>
+          </select>
         </div>
         <div>
-          <input class="text-base" v-model.trim="brand" />
+          <input class="text-base font-sans" v-model.trim="backgroundColor" />
         </div>
         <div>
-          <input class="text-base" v-model.trim="description" />
+          <input class="text-base font-sans" v-model.trim="productCode" />
         </div>
         <div>
-          <input class="text-base" v-model.trim="itemSize" />
+          <input class="text-base font-sans" v-model.trim="brandName" />
         </div>
         <div>
-          <input class="text-base" v-model.number="price" />
+          <input class="text-base font-sans" v-model.trim="description" />
+        </div>
+        <div>
+          <input class="text-base font-sans" v-model.trim="itemSize" />
+        </div>
+        <div>
+          <input class="text-base font-sans" v-model.number="retailPrice" />
+        </div>
+        <div>
+          <input id="isWeighed" type="checkbox" v-model="isWeighed" />
+          <label for="isWeighed" class="text-base font-sans">Weighed</label>
+        </div>
+        <div>
+          <input id="isTaxed" type="checkbox" v-model="isTaxed" />
+          <label for="isTaxed" class="text-base font-sans">Taxed</label>
+        </div>
+        <div>
+          <input id="isOrganic" type="checkbox" v-model="isOrganic" />
+          <label for="isOrganic" class="text-base font-sans">Organic</label>
         </div>
       </form>
     </div>
     <div class="flex flex-col gap-4">
-      <img class="labelaryImg" ref="labelaryImg" />
+      <labelary-tag-200x-125
+        class="border border-dotted"
+        :zpl="zpl"
+        :dpmm="dpmm"
+      />
       <div>
         <div class="flex gap-2">
           <copy-to-clipboard :value="zpl" label="copy ZPL" />
@@ -61,16 +100,27 @@
   gap: 1rem;
 }
 
+.justify-between {
+  justify-content: space-between;
+}
+
+.font-sans {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
 }
 
-.labelaryImg {
-  height: 1.25in;
-  width: 2in;
-  object-fit: contain;
-  background-color: mistyrose;
+.border {
+  border-width: 1px;
+}
+
+.border-dotted {
+  border-style: dotted;
 }
 </style>
 
@@ -78,60 +128,30 @@
 import ShelfTag from "@/components/ShelfTag200x125";
 import CopyToClipboard from "@/components/CopyToClipboard";
 import SendToLabelPrinter from "@/components/SendToLabelPrinter.vue";
+import LabelaryTag200x125 from "@/components/LabelaryTag200x125.vue";
 
 export default {
   data() {
     return {
       productCode: "015532000039",
-      brand: "Montebello",
+      brandName: "Montebello",
       description: "Spinach Fettuccini",
-      price: 4.79,
+      retailPrice: 4.79,
       itemSize: "12 OZ",
-      // productCode: "1234ABC",
-      // brand: "Vosges",
-      // description: "Raw Honey Cacao 100%",
-      // price: 7.99,
-      // itemSize: undefined,
+      isWeighed: false,
+      isTaxed: false,
+      isOrganic: false,
+      mode: "canvas",
+      dpmm: 12,
       zpl: undefined,
+      backgroundColor: "#EFDBB2",
     };
   },
   components: {
     ShelfTag,
     CopyToClipboard,
     SendToLabelPrinter,
-  },
-  watch: {
-    zpl(val) {
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(async () => {
-        this.abortController && this.abortController.abort();
-        this.abortController = new AbortController();
-
-        const dpmm = 12;
-        const width = 2;
-        const height = 1.25;
-        const index = 0;
-        const url = `http://api.labelary.com/v1/printers/${dpmm}dpmm/labels/${width}x${height}/${index}/`;
-
-        const body = new FormData();
-        body.append("file", new Blob([val], { type: "text/plain" }), "blob");
-
-        const signal = this.abortController.signal;
-
-        const res = await fetch(url, {
-          method: "post",
-          headers: {
-            accept: "image/png",
-          },
-          body,
-          signal,
-        });
-        const data = await res.blob();
-
-        const el = this.$refs.labelaryImg;
-        el.src = URL.createObjectURL(data);
-      }, 500);
-    },
+    LabelaryTag200x125,
   },
 };
 </script>
