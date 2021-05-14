@@ -364,7 +364,7 @@ export default {
         metrics,
         ctx,
         canvas,
-      } = this.computeValues(ctx);
+      } = this.computeValues();
 
       ctx.save();
 
