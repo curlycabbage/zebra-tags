@@ -1,6 +1,6 @@
 # zebra-tags
 
-A vue component library for printing tags with ZPL.
+A Vue.js 2 component library for printing tags with ZPL.
 
 ## standalone demo
 
