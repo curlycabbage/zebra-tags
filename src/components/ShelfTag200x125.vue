@@ -144,6 +144,11 @@ export default {
       const h = this.hr2 - this.hr1;
       return Math.round((h - h / gr) / 2);
     },
+
+    /** size of vertical gap used below the second line */
+    vr3gap() {
+      return Math.round((120 / gr ** 6 / 96) * this.dpi);
+    },
   },
   methods: {
     createFont(fontSize) {
@@ -325,7 +330,7 @@ export default {
         this.hr1 + (this.hr2 - this.hr1 - metrics.retailPriceText.height) / 2
       );
 
-      metrics.description.top = Math.round(this.hr2 + this.vr2gap);
+      metrics.description.top = Math.round(this.hr2 + this.vr3gap);
 
       metrics.unitCostText.top = Math.round(
         this.hr1 - this.vr1gap - metrics.unitCostText.height
