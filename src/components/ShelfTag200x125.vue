@@ -19,7 +19,7 @@
 
 <style lang="css" scoped>
 .canvas {
-  height: 1.25in;
+  height: 1.24in;
   width: 2in;
   display: block;
 }
@@ -95,7 +95,7 @@ export default {
 
     /** overall height */
     height() {
-      return Math.round((120 / 96) * this.dpi);
+      return Math.round((118 / 96) * this.dpi);
     },
 
     /** horizontal rule 1 */
@@ -120,7 +120,7 @@ export default {
 
     /** vertical margin */
     vm() {
-      return Math.round((120 / gr ** 7 / 96) * this.dpi);
+      return Math.round((118 / gr ** 7 / 96) * this.dpi);
     },
 
     /** width of dividing lines */

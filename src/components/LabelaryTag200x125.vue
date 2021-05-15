@@ -4,7 +4,7 @@
 
 <style lang="css" scoped>
 .labelary {
-  height: 1.25in;
+  height: 1.24in;
   width: 2in;
   object-fit: contain;
   display: block;
@@ -52,7 +52,7 @@ export default {
         const data = await fetchLabelaryImage(zpl, {
           dpmm: this.dpmm,
           width: 2,
-          height: 1.25,
+          height: 1.24,
           index: 0,
           signal,
         });
