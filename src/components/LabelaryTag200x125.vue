@@ -14,6 +14,10 @@
 <script>
 import { fetchLabelaryImage } from "./utils";
 
+// a tiny gif, taken from here: https://stackoverflow.com/a/19126281
+const blankImgSrc =
+  "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D";
+
 export default {
   props: {
     zpl: String,
@@ -31,12 +35,21 @@ export default {
   methods: {
     renderImage(delay) {
       clearTimeout(this.timeout);
+      this.abortController && this.abortController.abort();
+
+      if (!this.zpl) {
+        const el = this.$refs.labelary;
+        if (el) el.src = blankImgSrc;
+        return;
+      }
+
       this.timeout = setTimeout(async () => {
         this.abortController && this.abortController.abort();
         this.abortController = new AbortController();
         const signal = this.abortController.signal;
 
-        const data = await fetchLabelaryImage(this.zpl, {
+        const zpl = this.zpl;
+        const data = await fetchLabelaryImage(zpl, {
           dpmm: this.dpmm,
           width: 2,
           height: 1.25,
@@ -44,8 +57,12 @@ export default {
           signal,
         });
 
+        // if the zpl has changed the request came back, abandon the new image.
+        if (zpl !== this.zpl) return;
+
+        // update the image
         const el = this.$refs.labelary;
-        el.src = URL.createObjectURL(data);
+        if (el) el.src = URL.createObjectURL(data);
       }, delay);
     },
   },

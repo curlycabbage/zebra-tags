@@ -96,7 +96,7 @@
               v-model.trim="proxyUrl"
             />
           </div>
-          <div class="flex flex-col">
+          <div class="flex flex-col w-48">
             <label class="text-base font-sans mb-1">proxy response</label>
             <div
               class="
@@ -147,6 +147,10 @@
 
 .gap-4 {
   gap: 1rem;
+}
+
+.w-48 {
+  width: 12rem;
 }
 
 .justify-between {
