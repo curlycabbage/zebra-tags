@@ -68,17 +68,54 @@
         :zpl="zpl"
         :dpmm="dpmm"
       />
-      <div>
+      <div class="flex flex-col gap-2">
         <div class="flex gap-2">
-          <copy-to-clipboard :value="zpl" label="copy ZPL" />
           <send-to-label-printer
+            label="print http"
             :zpl="zpl"
-            label="print label"
-            printerUrl="http://192.168.88.34/pstprnt"
+            host="192.168.88.34"
+            mode="http"
+          />
+          <send-to-label-printer
+            label="print proxy"
+            :zpl="zpl"
+            host="192.168.88.34"
+            mode="proxy"
+            :proxyUrl="proxyUrl"
+            :disabled="!proxyUrl"
+            @click="proxyResponse = undefined"
+            @success="proxyResponse = $event"
+            @error="proxyResponse = $event"
           />
         </div>
-        <pre><code>{{zpl}}</code></pre>
+        <form @submit.prevent class="flex flex-col">
+          <div>
+            <input
+              class="text-base font-sans"
+              autocomplete="on"
+              v-model.trim="proxyUrl"
+            />
+          </div>
+          <div class="flex flex-col">
+            <label class="text-base font-sans mb-1">proxy response</label>
+            <div
+              class="
+                bg-gray-50
+                border border-solid
+                font-mono
+                whitespace-pre-line
+                p-2
+              "
+            >
+              {{ proxyResponse || "none" }}
+            </div>
+          </div>
+        </form>
       </div>
+      <div>
+        <copy-to-clipboard :value="zpl" label="copy ZPL" />
+      </div>
+      <pre><code>{{zpl}}</code></pre>
     </div>
   </div>
 </template>
@@ -90,6 +127,18 @@
 
 .flex-col {
   flex-direction: column;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.whitespace-pre-line {
+  white-space: pre-line;
 }
 
 .gap-2 {
@@ -110,6 +159,11 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -121,6 +175,14 @@
 
 .border-dotted {
   border-style: dotted;
+}
+
+.border-solid {
+  border-style: solid;
+}
+
+.bg-gray-50 {
+  background-color: rgba(243, 244, 246);
 }
 </style>
 
@@ -145,6 +207,8 @@ export default {
       dpmm: 12,
       zpl: undefined,
       backgroundColor: "#EFDBB2",
+      proxyUrl: process.env.VUE_APP_DEFAULT_PROXY_URL,
+      proxyResponse: undefined,
     };
   },
   components: {

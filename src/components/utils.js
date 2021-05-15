@@ -41,21 +41,38 @@ export async function fetchLabelaryImage(zpl, options) {
   return data;
 }
 
-export async function sendToPrinter(printerUrl, zpl) {
+export async function sendToPrinter(host, zpl) {
   const headers = new Headers();
   headers.append("Content-Type", "text/plain");
 
   const options = {
     method: "POST",
-    headers: headers,
-    body: zpl,
-    redirect: "follow",
     // Without a proxy, this is the best we can do.
     // The response, including the status code, will be opaque.
     mode: "no-cors",
+    cache: "no-cache",
+    headers: headers,
+    body: zpl,
   };
 
-  const res = await fetch(printerUrl, options);
+  const url = `http://${host}/pstprnt`;
+  const res = await fetch(url, options);
   const text = await res.text();
   return text;
+}
+
+export async function sendToProxy(proxyUrl, { host, zpl }) {
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+
+  const options = {
+    method: "POST",
+    cache: "no-cache",
+    headers,
+    body: JSON.stringify({ host, zpl }),
+  };
+
+  const res = await fetch(proxyUrl, options);
+  console.log(res);
+  return res.status;
 }
