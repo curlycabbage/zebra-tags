@@ -186,16 +186,15 @@ export default {
       const itemSizeText =
         !itemSize || isWeighed ? "" : `${unitCount} ${units}`;
 
-      const unitCostText = !itemSize
-        ? ""
-        : isWeighed
-        ? "/ LB"
-        : `${unitCost.toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}/${units}`;
+      const unitCostText =
+        !itemSize && !isWeighed
+          ? ""
+          : `${unitCost.toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}/${units}`;
 
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext("2d");
@@ -344,11 +343,16 @@ export default {
           metrics.itemSizeText.height
       );
 
-      if (isTaxed) {
-        result.isTaxedText = "+TX";
-        metrics.isTaxedText = {
-          fontSize: 24,
-          top: this.hr1 + (this.hr2 - this.hr1) / gr ** 6,
+      if (isTaxed || isWeighed) {
+        result.retailPriceSubtext = `${isWeighed ? "/LB" : ""}${
+          isTaxed ? "+TX" : ""
+        }`;
+        metrics.retailPriceSubtext = {
+          fontSize: 28,
+          top:
+            metrics.retailPriceText.top +
+            metrics.retailPriceText.height +
+            (this.hr2 - this.hr1) / gr ** 8,
         };
       }
 
@@ -376,7 +380,7 @@ export default {
         itemSizeText,
         unitCostText,
         retailPriceText,
-        isTaxedText,
+        retailPriceSubtext,
         isOrganic,
         metrics,
       } = this.computeValues();
@@ -396,14 +400,14 @@ export default {
 01CLFCE,00E3EJF1C,0078JFC78,001C3IF0E,I0F80407C,I03F003F,J07IF8,K0FF8,
 ^FS`;
 
-      const isTaxedZpl = !isTaxedText
+      const retailPriceSubtextZpl = !retailPriceSubtext
         ? ""
         : `
 ^FX isTaxed ^FS
-^FO${this.vr2},${metrics.isTaxedText.top}
+^FO${this.vr2},${metrics.retailPriceSubtext.top}
 ^FB${this.width - this.vr2 - this.hm},2,,R,
-^A0,${metrics.isTaxedText.fontSize}
-^FD${isTaxedText}\\&
+^A0,${metrics.retailPriceSubtext.fontSize}
+^FD${retailPriceSubtext}\\&
 ^FS`;
 
       const value = `^XA
@@ -449,14 +453,14 @@ export default {
 ^FD${unitCostText}\\&
 ^FS
 
-${isTaxedZpl}
-
 ^FX retailPrice ^FS
 ^FO${this.vr2},${metrics.retailPriceText.top}
 ^FB${this.width - this.vr2 - this.hm},2,,R,
 ^A0,${metrics.retailPriceText.fontSize}
 ^FD${retailPriceText}\\&
 ^FS
+
+${retailPriceSubtextZpl}
 
 ^FX text1 ^FS
 ^FO0,${metrics.brandName.top}

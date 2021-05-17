@@ -8,9 +8,9 @@ export function sanitize(value) {
 export function computeUnitCost({ itemSize, price, isWeighed }) {
   if (isWeighed) {
     return {
-      units: "LB",
-      unitCount: 1,
-      unitCost: price,
+      units: "OZ",
+      unitCount: 16,
+      unitCost: price / 16,
     };
   }
   itemSize = itemSize || "";
