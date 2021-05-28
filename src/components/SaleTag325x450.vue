@@ -511,7 +511,7 @@ export default {
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
-      ctx.font = this.createFont(metrics.salePriceText.fontSize);
+      ctx.font = this.createFont(metrics.salePriceText.fontSize, true);
       ctx.fillText(salePriceText, center, metrics.salePriceText.top);
 
       // SAVINGS TEXT
