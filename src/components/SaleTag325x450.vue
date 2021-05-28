@@ -386,13 +386,13 @@ export default {
         metrics.itemSizeText.top = offset;
       }
 
-      offset += lineHeight * 1.5;
+      offset += lineHeight * 1.4;
       metrics.retailPriceText.top = offset;
 
-      offset += lineHeight * 1.5;
+      offset += lineHeight * 1.4;
       metrics.lowerPriceText.top = offset;
 
-      offset += lineHeight * 1.5;
+      offset += lineHeight * 1.6;
       metrics.salePriceText.top = offset;
 
       offset += metrics.salePriceText.height * 1.5;
