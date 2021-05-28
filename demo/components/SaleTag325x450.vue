@@ -96,7 +96,7 @@ export default {
       description: "Spinach Fettuccini",
       retailPrice: 4.79,
       salePrice: 3.35,
-      percentOff: 0.7,
+      percentOff: 70,
       itemSize: "12 OZ",
       isWeighed: false,
       isTaxed: false,

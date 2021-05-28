@@ -159,7 +159,7 @@ export default {
       const retailPrice = this.retailPrice || 0;
       const salePrice = this.salePrice || retailPrice;
       const savings = retailPrice - salePrice;
-      const percentOff = this.percentOff || savings / retailPrice;
+      const percentOff = this.percentOff || (100 * savings) / retailPrice;
 
       const { units, unitCount, unitCost } = computeUnitCost({
         itemSize,
@@ -181,7 +181,7 @@ export default {
         maximumFractionDigits: 2,
       })}/${isWeighed ? "lb" : "ea"}`;
 
-      const percentOffText = `${percentOff.toLocaleString("en-US", {
+      const percentOffText = `${(percentOff / 100).toLocaleString("en-US", {
         style: "percent",
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,

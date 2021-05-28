@@ -361,7 +361,7 @@ export default {
           top:
             metrics.retailPriceText.top +
             metrics.retailPriceText.height +
-            (this.hr2 - this.hr1) / gr ** 8,
+            (this.hr2 - this.hr1) / gr ** 6,
         };
       }
 
