@@ -279,7 +279,7 @@ export default {
           maxWidth: dpi.width - dpi.hm * 2,
         },
         savingsText: {
-          maxFontSize: 96,
+          maxFontSize: 120,
           maxWidth: dpi.width - dpi.hm * 2,
         },
         unitCostText: {
@@ -392,10 +392,10 @@ export default {
       offset += lineHeight * 1.5;
       metrics.lowerPriceText.top = offset;
 
-      offset += lineHeight * 2.0;
+      offset += lineHeight * 1.5;
       metrics.salePriceText.top = offset;
 
-      offset += metrics.salePriceText.height * 1.3;
+      offset += metrics.salePriceText.height * 1.5;
       metrics.savingsText.top = offset;
 
       metrics.productCodeText.top =
