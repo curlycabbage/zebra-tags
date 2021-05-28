@@ -369,7 +369,7 @@ export default {
 
       offset += metrics.percentOffText.height * 0.3;
       metrics.percentOffText.top = offset;
-      offset += metrics.percentOffText.height;
+      offset += metrics.percentOffText.height * 0.9;
 
       const lineHeight = metrics.description.height;
 
@@ -386,13 +386,13 @@ export default {
         metrics.itemSizeText.top = offset;
       }
 
-      offset += lineHeight * 1.4;
+      offset += lineHeight * 1.8;
       metrics.retailPriceText.top = offset;
 
       offset += lineHeight * 1.4;
       metrics.lowerPriceText.top = offset;
 
-      offset += lineHeight * 1.6;
+      offset += lineHeight * 2.0;
       metrics.salePriceText.top = offset;
 
       offset += metrics.salePriceText.height * 1.5;
