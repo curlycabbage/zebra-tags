@@ -2,7 +2,7 @@
   <div class="flex gap-4">
     <div class="flex flex-col gap-4">
       <div>
-        <shelf-tag
+        <ShelfTag200x125
           class="border border-dotted"
           :productCode="productCode"
           :brandName="brandName"
@@ -16,6 +16,7 @@
           :dpmm="dpmm"
           :backgroundColor="backgroundColor"
           @zpl="zpl = $event"
+          @src="src = $event"
         />
       </div>
       <form @submit.prevent class="flex flex-col gap-4">
@@ -63,20 +64,16 @@
       </form>
     </div>
     <div class="flex flex-col gap-4">
-      <labelary-tag-200x-125
-        class="border border-dotted"
-        :zpl="zpl"
-        :dpmm="dpmm"
-      />
+      <ImageTag200x125 class="border border-dotted" :src="src" />
       <div class="flex flex-col gap-2">
         <div class="flex gap-2">
-          <send-to-label-printer
+          <SendToLabelPrinter
             label="print http"
             :zpl="zpl"
             host="192.168.88.34"
             mode="http"
           />
-          <send-to-label-printer
+          <SendToLabelPrinter
             label="print proxy"
             :zpl="zpl"
             host="192.168.88.34"
@@ -113,7 +110,7 @@
         </form>
       </div>
       <div>
-        <copy-to-clipboard :value="zpl" label="copy ZPL" />
+        <CopyToClipboard :value="zpl" label="copy ZPL" />
       </div>
       <pre><code>{{zpl}}</code></pre>
     </div>
@@ -121,80 +118,15 @@
 </template>
 
 <style lang="postcss" scoped>
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.p-2 {
-  padding: 0.5rem;
-}
-
-.mb-1 {
-  margin-bottom: 0.25rem;
-}
-
-.whitespace-pre-line {
-  white-space: pre-line;
-}
-
-.gap-2 {
-  gap: 0.5rem;
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-.w-48 {
-  width: 12rem;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.font-sans {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
-}
-
-.text-base {
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-
-.border {
-  border-width: 1px;
-}
-
-.border-dotted {
-  border-style: dotted;
-}
-
-.border-solid {
-  border-style: solid;
-}
-
-.bg-gray-50 {
-  background-color: rgba(243, 244, 246);
-}
+@import "./demo.css";
 </style>
 
 <script>
-import ShelfTag from "@/components/ShelfTag200x125";
+import ShelfTag200x125 from "@/components/ShelfTag200x125";
 import CopyToClipboard from "@/components/CopyToClipboard";
 import SendToLabelPrinter from "@/components/SendToLabelPrinter.vue";
-import LabelaryTag200x125 from "@/components/LabelaryTag200x125.vue";
+import ImageTag200x125 from "@/components/ImageTag200x125.vue";
+import { getBlankImage } from "../../src/components/utils";
 
 export default {
   data() {
@@ -210,16 +142,17 @@ export default {
       mode: "canvas",
       dpmm: 12,
       zpl: undefined,
+      src: getBlankImage(),
       backgroundColor: "#EFDBB2",
       proxyUrl: process.env.VUE_APP_DEFAULT_PROXY_URL,
       proxyResponse: undefined,
     };
   },
   components: {
-    ShelfTag,
+    ShelfTag200x125,
     CopyToClipboard,
     SendToLabelPrinter,
-    LabelaryTag200x125,
+    ImageTag200x125,
   },
 };
 </script>

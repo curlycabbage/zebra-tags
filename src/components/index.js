@@ -1,3 +1,3 @@
-export { default as ZebraTagsSample } from "./zebra-tags-sample.vue";
 export { default as ShelfTag200x125 } from "./ShelfTag200x125.vue";
+export { default as SaleTag325x450 } from "./SaleTag325x450.vue";
 export { sendToPrinter, sendToProxy } from "./utils";

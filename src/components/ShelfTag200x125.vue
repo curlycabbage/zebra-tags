@@ -8,11 +8,10 @@
       :width="width"
       :height="height"
     />
-    <labelary-tag-200x-125
-      v-if="mode === 'labelary'"
-      :zpl="zpl"
-      :dpmm="dpmm"
-      :backgroundColor="backgroundColor"
+    <ImageTag200x125
+      v-show="mode === 'labelary'"
+      :src="src"
+      :style="backgroundColor ? `background-color: ${backgroundColor}` : ''"
     />
   </div>
 </template>
@@ -26,15 +25,19 @@
 </style>
 
 <script>
-import { computeUnitCost, sanitize } from "./utils";
-import LabelaryTag200x125 from "./LabelaryTag200x125.vue";
-
-/** golden ratio */
-const gr = 1.618;
+import ImageTag200x125 from "./ImageTag200x125.vue";
+import {
+  computeUnitCost,
+  formatProductCode,
+  getBlankImage,
+  sanitize,
+  fetchLabelaryImage,
+  gr,
+} from "./utils";
 
 export default {
   name: "ShelfTag200x125",
-  components: { LabelaryTag200x125 },
+  components: { ImageTag200x125 },
   props: {
     productCode: String,
     brandName: String,
@@ -53,6 +56,8 @@ export default {
     return {
       /** the computed zpl */
       zpl: undefined,
+      src: getBlankImage(),
+      loading: false,
     };
   },
   mounted() {
@@ -70,16 +75,20 @@ export default {
         vm.fontFamily,
         vm.lineWidth,
         vm.backgroundColor,
+        vm.mode,
       ],
       () => {
         this.drawTag();
-        this.zpl = this.computeZpl();
+        this.computeZpl();
+        this.loadImage(500);
       },
       {
-        immediate: true,
         deep: true,
       }
     );
+    this.drawTag();
+    this.computeZpl();
+    this.loadImage(0);
   },
   computed: {
     /** dots per inch, converted from dpmm */
@@ -149,17 +158,12 @@ export default {
     vr3gap() {
       return Math.round((120 / gr ** 6 / 96) * this.dpi);
     },
-  },
-  methods: {
-    createFont(fontSize) {
-      return `bold condensed ${fontSize}px ${this.fontFamily}`;
-    },
-    computeValues() {
+    computedValues() {
       /** width multiplier */
-      const wm = 1.1;
+      const wx = 1.1;
 
       /** height multipler */
-      const hm = 1;
+      const hx = 1;
 
       const productCode = sanitize(this.productCode);
       const brandName = sanitize(this.brandName);
@@ -169,6 +173,8 @@ export default {
       const isTaxed = this.isTaxed ? true : false;
       const isOrganic = this.isOrganic ? true : false;
       const retailPrice = this.retailPrice;
+
+      const productCodeText = formatProductCode(productCode);
 
       const { units, unitCount, unitCost } = computeUnitCost({
         itemSize,
@@ -211,10 +217,12 @@ export default {
           const testValue = value
             .replace(/[gqp]/g, "d")
             .replace(/[y]/g, "v")
-            .replace(/[j]/g, "i");
+            .replace(/[j]/g, "i")
+            .replace(/[$]/g, "S")
+            .replace(/[,]/g, ".");
           ctx.font = this.createFont(fontSize);
           metrics = ctx.measureText(testValue);
-          if (metrics.width * wm <= maxWidth || fontSize <= min) break;
+          if (metrics.width * wx <= maxWidth || fontSize <= min) break;
           fontSize -= 2;
         }
 
@@ -225,13 +233,13 @@ export default {
           metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
         return {
           fontSize,
-          width: width * wm,
-          height: height * hm,
+          width: width * wx,
+          height: height * hx,
         };
       };
 
       const metrics = {
-        productCode: {
+        productCodeText: {
           maxFontSize: 40,
           maxWidth: this.vr2 - this.hm * 2,
         },
@@ -257,6 +265,7 @@ export default {
 
       const result = {
         productCode,
+        productCodeText,
         brandName,
         description,
         itemSize,
@@ -317,8 +326,8 @@ export default {
         metrics.brandName.height = metrics.brandName.height * 2.3;
       }
 
-      metrics.productCode.top = Math.round(
-        this.hr1 - this.vr1gap - metrics.productCode.height
+      metrics.productCodeText.top = Math.round(
+        this.hr1 - this.vr1gap - metrics.productCodeText.height
       );
 
       metrics.brandName.top = Math.round(
@@ -358,6 +367,46 @@ export default {
 
       return result;
     },
+  },
+  methods: {
+    loadImage(delay) {
+      this.loading = true;
+      clearTimeout(this.timeout);
+      this.abortController && this.abortController.abort();
+
+      if (!this.zpl) {
+        this.src = getBlankImage();
+        this.$emit("src", this.src);
+        this.loading = false;
+        return;
+      }
+
+      this.timeout = setTimeout(async () => {
+        this.abortController && this.abortController.abort();
+        this.abortController = new AbortController();
+        const signal = this.abortController.signal;
+
+        const zpl = this.zpl;
+        const data = await fetchLabelaryImage(zpl, {
+          dpmm: this.dpmm,
+          width: 2,
+          height: 1.24,
+          index: 0,
+          signal,
+        });
+
+        // if the zpl has changed the request came back, abandon the new image.
+        if (zpl !== this.zpl) return;
+
+        // update the image
+        this.src = URL.createObjectURL(data);
+        this.$emit("src", this.src);
+        this.loading = false;
+      }, delay);
+    },
+    createFont(fontSize) {
+      return `bold condensed ${fontSize}px ${this.fontFamily}`;
+    },
     computeRbg() {
       const styles = window.getComputedStyle(this.$refs.canvas);
       const color = styles && styles.backgroundColor;
@@ -375,6 +424,7 @@ export default {
     computeZpl() {
       const {
         productCode,
+        productCodeText,
         brandName,
         description,
         itemSizeText,
@@ -383,7 +433,7 @@ export default {
         retailPriceSubtext,
         isOrganic,
         metrics,
-      } = this.computeValues();
+      } = this.computedValues;
 
       const { r, g, b } = this.computeRbg();
       const backgroundZpl = `~BR0,0,${this.width},${this.height},${r},${g},${b}`;
@@ -433,10 +483,10 @@ export default {
 ^FS
 
 ^FX product code ^FS
-^FO0,${metrics.productCode.top}
+^FO0,${metrics.productCodeText.top}
 ^FB${this.vr2},2,,C,
-^A0,${metrics.productCode.fontSize}
-^FD${productCode}\\&
+^A0,${metrics.productCodeText.fontSize}
+^FD${productCodeText}\\&
 ^FS
 
 ^FX item size ^FS
@@ -481,12 +531,12 @@ ${isOrganicZpl}
 ${backgroundZpl}
 
 ^XZ`;
+      this.zpl = value;
       this.$emit("zpl", value);
-      return value;
     },
     drawTag() {
       const {
-        productCode,
+        productCodeText,
         brandName,
         description,
         retailPriceText,
@@ -496,7 +546,7 @@ ${backgroundZpl}
         metrics,
         ctx,
         canvas,
-      } = this.computeValues();
+      } = this.computedValues;
 
       ctx.save();
 
@@ -526,8 +576,8 @@ ${backgroundZpl}
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
-      ctx.font = this.createFont(metrics.productCode.fontSize);
-      ctx.fillText(productCode, this.vr2 / 2, metrics.productCode.top);
+      ctx.font = this.createFont(metrics.productCodeText.fontSize);
+      ctx.fillText(productCodeText, this.vr2 / 2, metrics.productCodeText.top);
 
       // ITEM SIZE
 
@@ -607,6 +657,10 @@ ${backgroundZpl}
       ctx.fillText(description, this.width / 2, metrics.description.top);
 
       ctx.restore();
+
+      if (this.mode === "labelary") {
+        this.src = canvas.toDataURL();
+      }
     },
   },
 };
