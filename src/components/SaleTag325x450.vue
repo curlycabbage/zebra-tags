@@ -220,13 +220,14 @@ export default {
         let metrics;
         for (;;) {
           // for measurement purposes, replace characters that hang below the line
-          // with characters of equivalent width.
+          // with similar characters of equivalent width.
           const testValue = value
             .replace(/[gqp]/g, "d")
             .replace(/[y]/g, "v")
             .replace(/[j]/g, "i")
             .replace(/[$]/g, "S")
-            .replace(/[,]/g, ".");
+            .replace(/[@]/g, "W")
+            .replace(/[^a-zA-Z0-9 ]/g, ".");
           ctx.font = this.createFont(fontSize);
           metrics = ctx.measureText(testValue);
           if (metrics.width * wx <= maxWidth || fontSize <= min) break;
@@ -287,7 +288,7 @@ export default {
           maxWidth: dpi.width - dpi.hm * 2,
         },
         productCodeText: {
-          maxFontSize: 40,
+          maxFontSize: 36,
           maxWidth: dpi.width - dpi.hm * 2,
         },
       };
