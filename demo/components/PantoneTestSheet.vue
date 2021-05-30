@@ -1,14 +1,9 @@
 <template>
   <div class="grid">
-    <ShelfTag200x125
-      class="border border-dotted"
-      v-bind="tagData"
-      @src="src = $event"
-    />
+    <ShelfTag200x125 v-bind="tagData" @src="src = $event" />
     <ImageTag200x125
       v-for="(tag, index) in imageTags"
       :key="index"
-      class="border border-dotted"
       :src="tag.src"
     />
   </div>
