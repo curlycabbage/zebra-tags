@@ -156,7 +156,7 @@ export default {
     },
     computedValues() {
       /** width multiplier */
-      const wx = 1;
+      const wx = 1.05;
 
       /** height multipler */
       const hx = 1;
@@ -358,7 +358,7 @@ export default {
           top:
             metrics.retailPriceText.top +
             metrics.retailPriceText.height +
-            (this.hr2 - this.hr1) / gr ** 6,
+            (this.hr2 - this.hr1) / gr ** 7,
         };
       }
 
