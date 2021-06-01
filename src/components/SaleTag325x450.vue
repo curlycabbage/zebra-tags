@@ -90,7 +90,6 @@ export default {
         vm.isTaxed,
         vm.isOrganic,
         vm.dpmm,
-        vm.fontFamily,
         vm.lineWidth,
         vm.backgroundColor,
       ],
@@ -125,17 +124,11 @@ export default {
       });
       return result;
     },
-
-    /** something to approximate the scalable Zebra font 0 */
-    fontFamily() {
-      return "sans-serif";
-    },
   },
   methods: {
     createFont(fontSize, italic) {
-      return `${italic ? "italic " : ""}bold condensed ${fontSize}px ${
-        this.fontFamily
-      }`;
+      const italicText = italic ? "italic " : "";
+      return `${italicText}600 condensed ${fontSize}px sans-serif-condensed, sans-serif`;
     },
     computeValues() {
       /** width multiplier */

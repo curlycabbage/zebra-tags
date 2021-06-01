@@ -17,6 +17,8 @@
 </template>
 
 <style lang="css" scoped>
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap");
+
 .canvas {
   height: 1.24in;
   width: 2in;
@@ -72,7 +74,6 @@ export default {
         vm.isTaxed,
         vm.isOrganic,
         vm.dpmm,
-        vm.fontFamily,
         vm.lineWidth,
         vm.backgroundColor,
         vm.mode,
@@ -137,15 +138,10 @@ export default {
       return 3;
     },
 
-    /** something to approximate the scalable Zebra font 0 */
-    fontFamily() {
-      return "sans-serif";
-    },
-
     /** size of vertical gap used above first line */
     vr1gap() {
       const h = this.hr1;
-      return Math.round(h / gr ** 5);
+      return Math.round(h / gr ** 6);
     },
 
     /** size of vertical gap used between first and second lines */
@@ -160,7 +156,7 @@ export default {
     },
     computedValues() {
       /** width multiplier */
-      const wx = 1.1;
+      const wx = 1;
 
       /** height multipler */
       const hx = 1;
@@ -406,7 +402,8 @@ export default {
       }, delay);
     },
     createFont(fontSize) {
-      return `bold condensed ${fontSize}px ${this.fontFamily}`;
+      // Oswald is an excellent approximation of Zebra 0.
+      return `600 condensed ${fontSize}px Oswald, sans-serif-condensed, sans-serif`;
     },
     computeRbg() {
       const styles = window.getComputedStyle(this.$refs.canvas);
