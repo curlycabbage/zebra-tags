@@ -24,9 +24,9 @@
         'background-color': backgroundColor,
       }"
     />
-    <img
+    <OrganicSeal
       v-if="isOrganic"
-      src="../assets/organicSealColor.svg"
+      :color="true"
       class="organic-seal"
       ref="seal"
     />
@@ -53,14 +53,16 @@
 
 .organic-seal {
   position: absolute;
-  left: 5%;
-  bottom: 4%;
-  height: 15%;
+  left: 0.15in;
+  bottom: 0.15in;
+  height: 0.7in;
+  width: 0.7in;
 }
 </style>
 
 <script>
 import bwipjs from "bwip-js";
+import OrganicSeal from "./OrganicSeal";
 
 import {
   computeUnitCost,
@@ -72,6 +74,9 @@ import {
 
 export default {
   name: "ItemTag325x450",
+  components: {
+    OrganicSeal,
+  },
   props: {
     productCode: String,
     brandName: String,
