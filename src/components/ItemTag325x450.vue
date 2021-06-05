@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="item-tag">
     <canvas
       v-show="mode === 'canvas'"
       ref="canvas"
@@ -24,10 +24,20 @@
         'background-color': backgroundColor,
       }"
     />
+    <img
+      v-if="isOrganic"
+      src="../assets/organicSealColor.svg"
+      class="organic-seal"
+      ref="seal"
+    />
   </div>
 </template>
 
 <style lang="css" scoped>
+.item-tag {
+  position: relative;
+}
+
 .canvas {
   height: 4.5in;
   width: 3.25in;
@@ -40,9 +50,18 @@
   display: block;
   object-fit: contain;
 }
+
+.organic-seal {
+  position: absolute;
+  left: 5%;
+  bottom: 4%;
+  height: 15%;
+}
 </style>
 
 <script>
+import bwipjs from "bwip-js";
+
 import {
   computeUnitCost,
   sanitize,
@@ -52,7 +71,7 @@ import {
 } from "./utils";
 
 export default {
-  name: "SaleTag325x450",
+  name: "ItemTag325x450",
   props: {
     productCode: String,
     brandName: String,
@@ -124,13 +143,8 @@ export default {
       });
       return result;
     },
-  },
-  methods: {
-    createFont(fontSize, italic) {
-      const italicText = italic ? "italic " : "";
-      return `${italicText}600 condensed ${fontSize}px sans-serif-condensed, sans-serif`;
-    },
-    computeValues() {
+
+    computedValues() {
       /** width multiplier */
       const wx = 1.1;
 
@@ -140,8 +154,6 @@ export default {
       /** measurements in dots per inch. */
       const { dpi } = this;
 
-      const salesText = "SALE";
-      const lowerPriceText = "new low price";
       const productCode = sanitize(this.productCode);
       const brandName = sanitize(this.brandName);
       const description = sanitize(this.description);
@@ -150,9 +162,6 @@ export default {
       const isTaxed = this.isTaxed ? true : false;
       const isOrganic = this.isOrganic ? true : false;
       const retailPrice = this.retailPrice || 0;
-      const salePrice = this.salePrice || retailPrice;
-      const savings = retailPrice - salePrice;
-      const percentOff = this.percentOff || (100 * savings) / retailPrice;
 
       const { units, unitCount, unitCost } = computeUnitCost({
         itemSize,
@@ -160,32 +169,13 @@ export default {
         isWeighed,
       });
 
-      const retailPriceText = `was ${retailPrice.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`;
-
-      const salePriceText = `${salePrice.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}/${isWeighed ? "lb" : "ea"}`;
-
-      const percentOffText = `${(percentOff / 100).toLocaleString("en-US", {
-        style: "percent",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      })} OFF`;
-
-      const savingsText = `SAVE ${savings.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`;
+      const retailPriceText =
+        retailPrice.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }) + (isWeighed ? "/lb" : "");
 
       const itemSizeText =
         !itemSize || isWeighed ? "" : `${unitCount} ${units}`;
@@ -240,44 +230,24 @@ export default {
       };
 
       const metrics = {
-        salesText: {
-          maxFontSize: 120,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        percentOffText: {
-          maxFontSize: 120,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
         brandName: {
-          maxFontSize: 56,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        description: {
-          maxFontSize: 56,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        retailPriceText: {
-          maxFontSize: 56,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        itemSizeText: {
-          maxFontSize: 42,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        lowerPriceText: {
-          maxFontSize: 56,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        salePriceText: {
           maxFontSize: 96,
           maxWidth: dpi.width - dpi.hm * 2,
         },
-        savingsText: {
-          maxFontSize: 120,
+        description: {
+          maxFontSize: 96,
+          maxWidth: dpi.width - dpi.hm * 2,
+        },
+        retailPriceText: {
+          maxFontSize: 84,
+          maxWidth: dpi.width - dpi.hm * 2,
+        },
+        itemSizeText: {
+          maxFontSize: 72,
           maxWidth: dpi.width - dpi.hm * 2,
         },
         unitCostText: {
-          maxFontSize: 48,
+          maxFontSize: 72,
           maxWidth: dpi.width - dpi.hm * 2,
         },
         productCodeText: {
@@ -287,18 +257,10 @@ export default {
       };
 
       const result = {
-        salesText,
-        percentOff,
-        percentOffText,
         brandName,
         description,
         retailPrice,
         retailPriceText,
-        lowerPriceText,
-        salePrice,
-        salePriceText,
-        savings,
-        savingsText,
         isWeighed,
         isTaxed,
         isOrganic,
@@ -323,61 +285,46 @@ export default {
       });
 
       let offset = dpi.hr1 + dpi.vm;
-      metrics.salesText.top = offset;
-      offset += metrics.salesText.height;
-
-      offset += metrics.percentOffText.height * 0.3;
-      metrics.percentOffText.top = offset;
-      offset += metrics.percentOffText.height * 0.9;
 
       const lineHeight = metrics.description.height;
 
-      if (brandName) {
-        offset += lineHeight * 1.4;
-        metrics.brandName.top = offset;
-      }
+      metrics.description.top =
+        this.dpi.height / gr - metrics.description.height;
+      offset = metrics.description.top;
 
-      offset += lineHeight * 1.4;
-      metrics.description.top = offset;
+      if (brandName) {
+        metrics.brandName.top = offset - lineHeight * 4;
+      }
 
       if (itemSizeText) {
-        offset += lineHeight * 1.4;
-        metrics.itemSizeText.top = offset;
+        metrics.itemSizeText.top = offset + lineHeight * 1.5;
       }
 
-      offset += lineHeight * 1.8;
-      metrics.retailPriceText.top = offset;
-
-      offset += lineHeight * 1.4;
-      metrics.lowerPriceText.top = offset;
-
-      offset += lineHeight * 2.0;
-      metrics.salePriceText.top = offset;
-
-      offset += metrics.salePriceText.height * 1.5;
-      metrics.savingsText.top = offset;
+      metrics.retailPriceText.top = offset + lineHeight * 4;
 
       metrics.productCodeText.top =
         dpi.height - metrics.productCodeText.height * gr ** 2;
 
       return result;
     },
+  },
+  methods: {
+    createFont(fontSize, italic) {
+      const italicText = italic ? "italic " : "";
+      return `${italicText}600 condensed ${fontSize}px sans-serif-condensed, sans-serif`;
+    },
     drawTag() {
       const {
-        salesText,
-        percentOffText,
         brandName,
         description,
         itemSizeText,
         retailPriceText,
-        lowerPriceText,
-        salePriceText,
-        savingsText,
+        productCode,
         productCodeText,
         metrics,
         ctx,
         canvas,
-      } = this.computeValues();
+      } = this.computedValues;
 
       const { dpi } = this;
 
@@ -395,22 +342,6 @@ export default {
       ctx.stroke();
 
       const center = dpi.width / 2;
-
-      // SALE
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.salesText.fontSize);
-      ctx.fillText(salesText, center, metrics.salesText.top);
-
-      // PERCENT OFF
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.percentOffText.fontSize);
-      ctx.fillText(percentOffText, center, metrics.percentOffText.top);
 
       // BRAND
 
@@ -446,37 +377,33 @@ export default {
       ctx.font = this.createFont(metrics.retailPriceText.fontSize);
       ctx.fillText(retailPriceText, center, metrics.retailPriceText.top);
 
-      // NEW LOW PRICE
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.lowerPriceText.fontSize, true);
-      ctx.fillText(lowerPriceText, center, metrics.lowerPriceText.top);
-
-      // SALES TEXT
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.salePriceText.fontSize, true);
-      ctx.fillText(salePriceText, center, metrics.salePriceText.top);
-
-      // SAVINGS TEXT
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.savingsText.fontSize);
-      ctx.fillText(savingsText, center, metrics.savingsText.top);
-
       // PRODUCT CODE
+
+      const barcode = document.createElement("canvas");
+      bwipjs.toCanvas(barcode, {
+        bcid: "code128", // Barcode type
+        text: productCode, // Text to encode
+        scale: 3, // 3x scaling factor
+        height: 10, // Bar height, in millimeters
+        includetext: false, // Show human-readable text
+        textxalign: "center", // Always good to set this
+      });
+
+      ctx.drawImage(
+        barcode,
+        (this.dpi.width - barcode.width) / 2,
+        this.dpi.height - barcode.height
+      );
 
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
-      ctx.fillText(productCodeText, center, metrics.productCodeText.top);
+      ctx.fillText(
+        productCodeText,
+        center,
+        this.dpi.height - barcode.height - metrics.productCodeText.height * 1.5
+      );
 
       // AND DONE.
 
