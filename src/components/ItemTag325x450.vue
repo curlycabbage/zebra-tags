@@ -32,8 +32,8 @@
         position: 'absolute',
         left: `${0.15 * scale}in`,
         bottom: `${0.15 * scale}in`,
-        height: `${0.7 * scale}in`,
-        width: `${0.7 * scale}in`,
+        height: `${0.6 * scale}in`,
+        width: `${0.6 * scale}in`,
       }"
     />
   </div>
@@ -147,7 +147,7 @@ export default {
       const isOrganic = this.isOrganic ? true : false;
       const retailPrice = this.retailPrice || 0;
 
-      const { units, unitCount, unitCost } = computeUnitCost({
+      const { units, unitCount } = computeUnitCost({
         itemSize,
         price: retailPrice,
         isWeighed,
@@ -159,20 +159,7 @@ export default {
           currency: "USD",
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        }) + (isWeighed ? "/lb" : "");
-
-      const itemSizeText =
-        !itemSize || isWeighed ? "" : `${unitCount} ${units}`;
-
-      const unitCostText =
-        !itemSize && !isWeighed
-          ? ""
-          : `${unitCost.toLocaleString("en-US", {
-              style: "currency",
-              currency: "USD",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}/${units}`;
+        }) + (isWeighed ? "/lb" : "/ea");
 
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext("2d");
@@ -215,23 +202,15 @@ export default {
 
       const metrics = {
         brandName: {
-          maxFontSize: 96,
+          maxFontSize: 156,
           maxWidth: dpi.width - dpi.hm * 2,
         },
         description: {
-          maxFontSize: 96,
+          maxFontSize: 156,
           maxWidth: dpi.width - dpi.hm * 2,
         },
         retailPriceText: {
           maxFontSize: 84,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        itemSizeText: {
-          maxFontSize: 72,
-          maxWidth: dpi.width - dpi.hm * 2,
-        },
-        unitCostText: {
-          maxFontSize: 72,
           maxWidth: dpi.width - dpi.hm * 2,
         },
         productCodeText: {
@@ -250,12 +229,8 @@ export default {
         isOrganic,
         productCode,
         productCodeText,
-        itemSize,
-        itemSizeText,
         units,
         unitCount,
-        unitCost,
-        unitCostText,
         metrics,
         canvas,
         ctx,
@@ -268,23 +243,16 @@ export default {
         Object.assign(m, d);
       });
 
-      let offset = dpi.hr1 + dpi.vm;
+      const lineHeight = (dpi.height - dpi.hr1) / 12;
+      let anchor = dpi.height - (dpi.height - dpi.hr1) / gr;
 
-      const lineHeight = metrics.description.height;
-
-      metrics.description.top =
-        this.dpi.height / gr - metrics.description.height;
-      offset = metrics.description.top;
+      metrics.description.top = anchor; // - metrics.description.height / 2;
 
       if (brandName) {
-        metrics.brandName.top = offset - lineHeight * 4;
+        metrics.brandName.top = anchor - lineHeight * 3;
       }
 
-      if (itemSizeText) {
-        metrics.itemSizeText.top = offset + lineHeight * 1.5;
-      }
-
-      metrics.retailPriceText.top = offset + lineHeight * 4;
+      metrics.retailPriceText.top = anchor + lineHeight * 3.5;
 
       metrics.productCodeText.top =
         dpi.height - metrics.productCodeText.height * gr ** 2;
@@ -301,7 +269,6 @@ export default {
       const {
         brandName,
         description,
-        itemSizeText,
         retailPriceText,
         productCode,
         productCodeText,
@@ -345,14 +312,6 @@ export default {
       ctx.font = this.createFont(metrics.description.fontSize);
       ctx.fillText(description, center, metrics.description.top);
 
-      // ITEM SIZE
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.itemSizeText.fontSize);
-      ctx.fillText(itemSizeText, center, metrics.itemSizeText.top);
-
       // RETAIL PRICE
 
       ctx.textBaseline = "top";
@@ -375,8 +334,8 @@ export default {
 
       ctx.drawImage(
         barcode,
-        (this.dpi.width - barcode.width) / 2,
-        this.dpi.height - barcode.height
+        this.dpi.width - barcode.width - this.dpi.vm / 2,
+        this.dpi.height - barcode.height * 2
       );
 
       ctx.textBaseline = "top";
@@ -385,9 +344,22 @@ export default {
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
       ctx.fillText(
         productCodeText,
-        center,
-        this.dpi.height - barcode.height - metrics.productCodeText.height * 1.5
+        this.dpi.width - barcode.width / 2 - this.dpi.vm / 2,
+        this.dpi.height -
+          barcode.height * 2 -
+          metrics.productCodeText.height * 1.5
       );
+
+      ctx.beginPath();
+      ctx.arc(
+        center,
+        this.dpi.hr1 / 4,
+        this.dpi.hr1 / 10,
+        0,
+        Math.PI * 2,
+        true
+      ); // Outer circle
+      ctx.stroke();
 
       // AND DONE.
 

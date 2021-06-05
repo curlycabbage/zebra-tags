@@ -31,9 +31,9 @@
       :style="{
         position: 'absolute',
         left: `${0.15 * scale}in`,
-        bottom: `${0.89 * scale}in`,
-        height: `${0.7 * scale}in`,
-        width: `${0.7 * scale}in`,
+        bottom: `${0.9 * scale}in`,
+        height: `${0.6 * scale}in`,
+        width: `${0.6 * scale}in`,
       }"
     />
   </div>
@@ -334,16 +334,16 @@ export default {
 
       const lineHeight = metrics.description.height;
 
+      offset += lineHeight * 1.4;
       if (brandName) {
-        offset += lineHeight * 1.4;
         metrics.brandName.top = offset;
       }
 
       offset += lineHeight * 1.4;
       metrics.description.top = offset;
 
+      offset += lineHeight * 1.4;
       if (itemSizeText) {
-        offset += lineHeight * 1.4;
         metrics.itemSizeText.top = offset;
       }
 
@@ -479,6 +479,17 @@ export default {
 
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
       ctx.fillText(productCodeText, center, metrics.productCodeText.top);
+
+      ctx.beginPath();
+      ctx.arc(
+        center,
+        this.dpi.hr1 / 4,
+        this.dpi.hr1 / 10,
+        0,
+        Math.PI * 2,
+        true
+      ); // Outer circle
+      ctx.stroke();
 
       // AND DONE.
 
