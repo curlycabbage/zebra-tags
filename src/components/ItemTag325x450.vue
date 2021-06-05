@@ -1,5 +1,5 @@
 <template>
-  <div class="item-tag">
+  <div style="position: relative">
     <canvas
       v-show="mode === 'canvas'"
       ref="canvas"
@@ -27,38 +27,17 @@
     <OrganicSeal
       v-if="isOrganic"
       :color="true"
-      class="organic-seal"
       ref="seal"
+      :style="{
+        position: 'absolute',
+        left: `${0.15 * scale}in`,
+        bottom: `${0.15 * scale}in`,
+        height: `${0.7 * scale}in`,
+        width: `${0.7 * scale}in`,
+      }"
     />
   </div>
 </template>
-
-<style lang="css" scoped>
-.item-tag {
-  position: relative;
-}
-
-.canvas {
-  height: 4.5in;
-  width: 3.25in;
-  display: block;
-}
-
-.image {
-  height: 4.5in;
-  width: 3.25in;
-  display: block;
-  object-fit: contain;
-}
-
-.organic-seal {
-  position: absolute;
-  left: 0.15in;
-  bottom: 0.15in;
-  height: 0.7in;
-  width: 0.7in;
-}
-</style>
 
 <script>
 import bwipjs from "bwip-js";

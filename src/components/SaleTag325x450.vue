@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="position: relative">
     <canvas
       v-show="mode === 'canvas'"
       ref="canvas"
@@ -24,25 +24,24 @@
         'background-color': backgroundColor,
       }"
     />
+    <OrganicSeal
+      v-if="isOrganic"
+      :color="true"
+      ref="seal"
+      :style="{
+        position: 'absolute',
+        left: `${0.15 * scale}in`,
+        bottom: `${0.89 * scale}in`,
+        height: `${0.7 * scale}in`,
+        width: `${0.7 * scale}in`,
+      }"
+    />
   </div>
 </template>
 
-<style lang="css" scoped>
-.canvas {
-  height: 4.5in;
-  width: 3.25in;
-  display: block;
-}
-
-.image {
-  height: 4.5in;
-  width: 3.25in;
-  display: block;
-  object-fit: contain;
-}
-</style>
-
 <script>
+import OrganicSeal from "./OrganicSeal";
+
 import {
   computeUnitCost,
   sanitize,
@@ -53,6 +52,9 @@ import {
 
 export default {
   name: "SaleTag325x450",
+  components: {
+    OrganicSeal,
+  },
   props: {
     productCode: String,
     brandName: String,
