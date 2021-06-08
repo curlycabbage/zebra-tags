@@ -206,6 +206,7 @@ export default {
           maxWidth: dpi.width - dpi.hm * 2,
         },
         description: {
+          minFontSize: 108,
           maxFontSize: 156,
           maxWidth: dpi.width - dpi.hm * 2,
         },
@@ -242,6 +243,40 @@ export default {
         const d = deriveMetrics(v, m);
         Object.assign(m, d);
       });
+
+      // if description has overflown max width, split into two lines.
+      if (metrics.description.width > metrics.description.maxWidth) {
+        const segments = description.split(" ");
+        let value1 = "";
+        let value2 = description;
+        let lastGap = 0 - ctx.measureText(value2).width;
+        let longerValue = description;
+        // split description into two lines of approximately equal length
+        for (let i = 0, n = segments.length; i < n; i++) {
+          value1 = segments.slice(0, i + 1).join(" ");
+          value2 = segments.slice(i + 1).join(" ");
+          const m1 = ctx.measureText(value1);
+          const m2 = ctx.measureText(value2);
+          const currGap = m1.width - m2.width;
+          if (currGap > 0) {
+            longerValue = value1;
+            if (Math.abs(currGap) > Math.abs(lastGap)) {
+              value1 = segments.slice(0, i).join(" ");
+              value2 = segments.slice(i).join(" ");
+              longerValue = value2;
+            }
+            break;
+          }
+          lastGap = currGap;
+        }
+        result.description = `${value1}\n${value2}`;
+        const derived = deriveMetrics(longerValue, {
+          maxWidth: metrics.description.maxWidth,
+          maxFontSize: metrics.description.minFontSize,
+          minFontSize: metrics.description.minFontSize,
+        });
+        Object.assign(metrics.description, derived);
+      }
 
       const lineHeight = (dpi.height - dpi.hr1) / 12;
       let anchor = dpi.height - (dpi.height - dpi.hr1) / gr;
@@ -309,8 +344,19 @@ export default {
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
-      ctx.font = this.createFont(metrics.description.fontSize);
-      ctx.fillText(description, center, metrics.description.top);
+      const descLines = description.split("\n");
+      if (descLines.length > 1) {
+        ctx.font = this.createFont(metrics.description.fontSize);
+        ctx.fillText(descLines[0], center, metrics.description.top);
+        ctx.fillText(
+          descLines[1],
+          center,
+          metrics.description.top + metrics.description.height * 1.5
+        );
+      } else {
+        ctx.font = this.createFont(metrics.description.fontSize);
+        ctx.fillText(description, center, metrics.description.top);
+      }
 
       // RETAIL PRICE
 
