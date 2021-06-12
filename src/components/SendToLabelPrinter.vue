@@ -38,7 +38,6 @@ export default {
     },
     async printProxy() {
       const { proxyUrl, host, zpl } = this;
-      console.log("printProxy", { proxyUrl, host, zpl });
       try {
         const res = await sendToProxy(proxyUrl, { host, zpl });
         this.$emit("success", res);

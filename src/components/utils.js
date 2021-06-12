@@ -76,7 +76,6 @@ export async function sendToProxy(proxyUrl, { host, zpl }) {
   };
 
   const res = await fetch(proxyUrl, options);
-  console.log(res);
   return res.status;
 }
 
