@@ -59,7 +59,7 @@
       </form>
     </div>
     <div>
-      <SaleTag325x450
+      <SaleTag
         class="border border-dotted"
         :productCode="productCode"
         :brandName="brandName"
@@ -86,7 +86,7 @@
 </style>
 
 <script>
-import SaleTag325x450 from "@/components/SaleTag325x450";
+import SaleTag from "@/components/SaleTag";
 
 export default {
   data() {
@@ -111,7 +111,7 @@ export default {
     };
   },
   components: {
-    SaleTag325x450,
+    SaleTag,
   },
 };
 </script>

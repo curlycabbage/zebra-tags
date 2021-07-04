@@ -1,5 +1,6 @@
 <template>
   <svg
+    ref="svg"
     v-if="color"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:cc="http://creativecommons.org/ns#"
@@ -245,6 +246,7 @@
   </svg>
   <svg
     v-else
+    ref="svg"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:cc="http://creativecommons.org/ns#"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"

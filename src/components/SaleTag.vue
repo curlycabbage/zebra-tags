@@ -24,18 +24,7 @@
         'background-color': backgroundColor,
       }"
     />
-    <OrganicSeal
-      v-if="isOrganic"
-      :color="true"
-      ref="seal"
-      :style="{
-        position: 'absolute',
-        left: `${0.15 * scale}in`,
-        bottom: `${0.9 * scale}in`,
-        height: `${0.6 * scale}in`,
-        width: `${0.6 * scale}in`,
-      }"
-    />
+    <OrganicSeal v-show="false" :color="true" ref="seal" />
   </div>
 </template>
 
@@ -72,6 +61,8 @@ export default {
     mode: { type: String, default: "canvas" },
     backgroundColor: String,
     scale: { type: Number, default: 1 },
+    width: { type: Number, default: 3 },
+    height: { type: Number, default: 5 },
   },
   data() {
     return {
@@ -94,9 +85,11 @@ export default {
         vm.dpmm,
         vm.lineWidth,
         vm.backgroundColor,
+        vm.width,
+        vm.height,
       ],
       () => {
-        this.drawTag();
+        this.drawTagAsync();
       },
       {
         immediate: true,
@@ -108,8 +101,8 @@ export default {
     /** measurements in inches. */
     inch() {
       return {
-        width: 3.25,
-        height: 4.5,
+        width: this.width,
+        height: this.height,
         hr1: 1.25,
         hm: 0.25,
         vm: 0.3,
@@ -364,7 +357,7 @@ export default {
 
       return result;
     },
-    drawTag() {
+    async drawTagAsync() {
       const {
         salesText,
         percentOffText,
@@ -376,6 +369,7 @@ export default {
         salePriceText,
         savingsText,
         productCodeText,
+        isOrganic,
         metrics,
         ctx,
         canvas,
@@ -491,10 +485,39 @@ export default {
       ); // Outer circle
       ctx.stroke();
 
+      if (isOrganic) {
+        const svgNode = this.$refs.seal.$refs.svg;
+        const svgXml = new XMLSerializer().serializeToString(svgNode);
+        const svg64 = btoa(svgXml);
+        const b64Start = "data:image/svg+xml;base64,";
+        const image64 = b64Start + svg64;
+
+        const image = new Image();
+        await this.loadImageAsync(image, image64);
+        ctx.drawImage(
+          image,
+          this.dpi.vm,
+          this.dpi.height * 0.75 - this.dpi.hm - 180,
+          180,
+          180
+        );
+      }
+
       // AND DONE.
 
       ctx.restore();
+
       this.src = canvas.toDataURL();
+      canvas.toBlob((blob) => {
+        this.$emit("blob", blob);
+      });
+    },
+    loadImageAsync(image, src) {
+      image.src = src;
+      return new Promise((resolve, reject) => {
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+      });
     },
   },
 };

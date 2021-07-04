@@ -53,7 +53,7 @@
       </form>
     </div>
     <div>
-      <ItemTag325x450
+      <ItemTag
         class="border border-dotted"
         :productCode="productCode"
         :brandName="brandName"
@@ -67,7 +67,6 @@
         :dpmm="dpmm"
         :backgroundColor="backgroundColor"
         :scale="scale"
-        @zpl="zpl = $event"
       />
     </div>
   </div>
@@ -78,7 +77,7 @@
 </style>
 
 <script>
-import ItemTag325x450 from "@/components/ItemTag325x450";
+import ItemTag from "@/components/ItemTag";
 
 export default {
   data() {
@@ -94,14 +93,13 @@ export default {
       mode: "canvas",
       dpmm: 12,
       scale: 1,
-      zpl: undefined,
       backgroundColor: "#EFDBB2",
       proxyUrl: process.env.VUE_APP_DEFAULT_PROXY_URL,
       proxyResponse: undefined,
     };
   },
   components: {
-    ItemTag325x450,
+    ItemTag,
   },
 };
 </script>

@@ -396,6 +396,7 @@ export default {
         if (zpl !== this.zpl) return;
 
         // update the image
+        // TODO: URL.revokeObjectURL() on the old src.
         this.src = URL.createObjectURL(data);
         this.$emit("src", this.src);
         this.loading = false;
