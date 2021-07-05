@@ -239,7 +239,7 @@ export default {
 
       // if description has overflown max width, split into two lines.
       if (metrics.description.width > metrics.description.maxWidth) {
-        const segments = description.split(" ");
+        const segments = description.split(/[ ,]+/);
         let value1 = "";
         let value2 = description;
         let lastGap = 0 - ctx.measureText(value2).width;
@@ -307,6 +307,7 @@ export default {
       } = this.computedValues;
 
       const { dpi } = this;
+      const center = dpi.width / 2;
 
       ctx.save();
 
@@ -316,12 +317,17 @@ export default {
       ctx.strokeStyle = "black";
       ctx.lineWidth = this.lineWidth;
 
+      // PUNCH HOLE
+      ctx.beginPath();
+      ctx.arc(center, dpi.hr1 / 4, dpi.hr1 / 10, 0, Math.PI * 2, true);
+      ctx.stroke();
+
+      // CREASE LINE
+
       ctx.beginPath();
       ctx.moveTo(0, dpi.hr1);
       ctx.lineTo(dpi.width, dpi.hr1);
       ctx.stroke();
-
-      const center = dpi.width / 2;
 
       // BRAND
 
@@ -360,7 +366,7 @@ export default {
       ctx.font = this.createFont(metrics.retailPriceText.fontSize);
       ctx.fillText(retailPriceText, center, metrics.retailPriceText.top);
 
-      // PRODUCT CODE
+      // FOOTER WITH BARCODE, PRODUCT CODE AND SEAL
 
       const barcode = document.createElement("canvas");
       bwipjs.toCanvas(barcode, {
@@ -374,8 +380,8 @@ export default {
 
       ctx.drawImage(
         barcode,
-        this.dpi.width - barcode.width - this.dpi.vm,
-        this.dpi.height - barcode.height * 2
+        dpi.width - barcode.width - dpi.vm,
+        dpi.height - barcode.height * 2
       );
 
       ctx.textBaseline = "top";
@@ -384,22 +390,9 @@ export default {
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
       ctx.fillText(
         productCodeText,
-        this.dpi.width - barcode.width / 2 - this.dpi.vm,
-        this.dpi.height -
-          barcode.height * 2 -
-          metrics.productCodeText.height * 1.5
+        dpi.width - barcode.width / 2 - dpi.vm,
+        dpi.height - barcode.height * 2 - metrics.productCodeText.height * 1.5
       );
-
-      ctx.beginPath();
-      ctx.arc(
-        center,
-        this.dpi.hr1 / 4,
-        this.dpi.hr1 / 10,
-        0,
-        Math.PI * 2,
-        true
-      ); // Outer circle
-      ctx.stroke();
 
       if (isOrganic) {
         const svgNode = this.$refs.seal.$refs.svg;
@@ -409,13 +402,14 @@ export default {
         const image64 = b64Start + svg64;
 
         const image = new Image();
+        const height = 140;
         await this.loadImageAsync(image, image64);
         ctx.drawImage(
           image,
-          this.dpi.vm,
-          this.dpi.height - this.dpi.hm - 180,
-          180,
-          180
+          dpi.vm,
+          dpi.height - dpi.hm - height,
+          height,
+          height
         );
       }
 
