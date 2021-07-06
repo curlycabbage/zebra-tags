@@ -21,22 +21,60 @@
           <option :value="1.25">125%</option>
         </select>
         <div>
-          <input class="text-base font-sans" v-model.trim="backgroundColor" />
+          <input
+            class="text-base font-sans"
+            placeholder="background color"
+            v-model.trim="backgroundColor"
+          />
         </div>
         <div>
-          <input class="text-base font-sans" v-model.trim="productCode" />
+          <input
+            class="text-base font-sans"
+            placeholder="regular font URL"
+            v-model.trim="fontUrlRegular"
+          />
         </div>
         <div>
-          <input class="text-base font-sans" v-model.trim="brandName" />
+          <input
+            class="text-base font-sans"
+            placeholder="italic font URL"
+            v-model.trim="fontUrlItalic"
+          />
         </div>
         <div>
-          <input class="text-base font-sans" v-model.trim="description" />
+          <input
+            class="text-base font-sans"
+            placeholder="product code"
+            v-model.trim="productCode"
+          />
         </div>
         <div>
-          <input class="text-base font-sans" v-model.trim="itemSize" />
+          <input
+            class="text-base font-sans"
+            placeholder="brand"
+            v-model.trim="brandName"
+          />
         </div>
         <div>
-          <input class="text-base font-sans" v-model.number="retailPrice" />
+          <input
+            class="text-base font-sans"
+            placeholder="description"
+            v-model.trim="description"
+          />
+        </div>
+        <div>
+          <input
+            class="text-base font-sans"
+            placeholder="item size"
+            v-model.trim="itemSize"
+          />
+        </div>
+        <div>
+          <input
+            class="text-base font-sans"
+            placeholder="retail price"
+            v-model.number="retailPrice"
+          />
         </div>
         <div>
           <input id="isWeighed" type="checkbox" v-model="isWeighed" />
@@ -67,6 +105,7 @@
         :dpmm="dpmm"
         :backgroundColor="backgroundColor"
         :scale="scale"
+        :fontUrls="[fontUrlRegular, fontUrlItalic]"
       />
     </div>
   </div>
@@ -96,6 +135,8 @@ export default {
       backgroundColor: "#EFDBB2",
       proxyUrl: process.env.VUE_APP_DEFAULT_PROXY_URL,
       proxyResponse: undefined,
+      fontUrlRegular: process.env.VUE_APP_DEFAULT_FONT_URL_REGULAR,
+      fontUrlItalic: process.env.VUE_APP_DEFAULT_FONT_URL_ITALIC,
     };
   },
   components: {

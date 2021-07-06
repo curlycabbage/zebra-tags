@@ -64,10 +64,12 @@ export default {
     scale: { type: Number, default: 1 },
     width: { type: Number, default: 3 },
     height: { type: Number, default: 5 },
+    fontUrls: { type: Array },
   },
   data() {
     return {
       src: getBlankImage(),
+      canUseCustomFont: false,
     };
   },
   mounted() {
@@ -88,6 +90,7 @@ export default {
         vm.backgroundColor,
         vm.width,
         vm.height,
+        vm.fontUrls,
       ],
       async () => {
         await this.drawTagAsync();
@@ -122,11 +125,39 @@ export default {
     },
 
     computedValues() {
+      const canvas = this.$refs.canvas;
+      const ctx = canvas.getContext("2d");
+
       /** width multiplier */
       const wx = 1.1;
 
       /** height multipler */
-      const hx = 1;
+      const hx = (() => {
+        if (!this.canUseCustomFont) return 1;
+        ctx.save();
+        const testValue = "M";
+        ctx.font = this.createFont({
+          fontSize: 144,
+          italic: false,
+          useSystemFont: true,
+        });
+        const metrics1 = ctx.measureText(testValue);
+        ctx.font = this.createFont({
+          fontSize: 144,
+          italic: false,
+          useSystemFont: false,
+        });
+        const metrics2 = ctx.measureText(testValue);
+        ctx.restore();
+
+        console.log({ metrics1, metrics2 });
+
+        return (
+          (metrics1.actualBoundingBoxAscent +
+            metrics1.actualBoundingBoxDescent) /
+          (metrics2.actualBoundingBoxAscent + metrics2.actualBoundingBoxDescent)
+        );
+      })();
 
       /** measurements in dots per inch. */
       const { dpi } = this;
@@ -154,12 +185,12 @@ export default {
           maximumFractionDigits: 2,
         }) + (isWeighed ? "/lb" : "/ea");
 
-      const canvas = this.$refs.canvas;
-      const ctx = canvas.getContext("2d");
-
       const productCodeText = formatProductCode(productCode);
 
-      const deriveMetrics = (value, { maxWidth, maxFontSize, minFontSize }) => {
+      const deriveMetrics = (
+        value,
+        { maxWidth, maxFontSize, minFontSize, italic, useSystemFont }
+      ) => {
         ctx.save();
         const max = maxFontSize || 72;
         const min = minFontSize || 42;
@@ -175,7 +206,8 @@ export default {
             .replace(/[$]/g, "S")
             .replace(/[@]/g, "W")
             .replace(/[^a-zA-Z0-9 ]/g, ".");
-          ctx.font = this.createFont(fontSize);
+
+          ctx.font = this.createFont({ fontSize, italic, useSystemFont });
           metrics = ctx.measureText(testValue);
           if (metrics.width * wx <= maxWidth || fontSize <= min) break;
           fontSize -= 2;
@@ -210,6 +242,7 @@ export default {
         productCodeText: {
           maxFontSize: 36,
           maxWidth: dpi.width - dpi.hm * 2,
+          useSystemFont: true,
         },
       };
 
@@ -289,11 +322,29 @@ export default {
     },
   },
   methods: {
-    createFont(fontSize, italic) {
-      const italicText = italic ? "italic " : "";
-      return `${italicText}600 condensed ${fontSize}px sans-serif-condensed, sans-serif`;
+    createFont({ fontSize, italic, useSystemFont }) {
+      if (useSystemFont || !this.canUseCustomFont) {
+        const italicText = italic ? "italic " : "";
+        return `${italicText}600 condensed ${fontSize}px sans-serif-condensed, sans-serif`;
+      } else {
+        return `${fontSize}px item-tag`;
+      }
+    },
+    async loadFontAsync() {
+      this.canUseCustomFont = undefined;
+      const fonts = (this.fontUrls || []).filter((url) => url.trim());
+      if (fonts.length) {
+        const urls = fonts.map((url) => `url(${url})`).join(", ");
+        const font = new FontFace("item-tag", urls);
+        await font.load();
+        document.fonts.add(font);
+        await document.fonts.ready;
+        this.canUseCustomFont = true;
+      }
     },
     async drawTagAsync() {
+      await this.loadFontAsync();
+
       const {
         brandName,
         description,
@@ -335,7 +386,7 @@ export default {
         ctx.textBaseline = "top";
         ctx.textAlign = "center";
 
-        ctx.font = this.createFont(metrics.brandName.fontSize);
+        ctx.font = this.createFont(metrics.brandName);
         ctx.fillText(brandName, center, metrics.brandName.top);
       }
 
@@ -343,10 +394,10 @@ export default {
 
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
+      ctx.font = this.createFont(metrics.description);
 
       const descLines = description.split("\n");
       if (descLines.length > 1) {
-        ctx.font = this.createFont(metrics.description.fontSize);
         ctx.fillText(descLines[0], center, metrics.description.top);
         ctx.fillText(
           descLines[1],
@@ -354,7 +405,6 @@ export default {
           metrics.description.top + metrics.description.height * 1.5
         );
       } else {
-        ctx.font = this.createFont(metrics.description.fontSize);
         ctx.fillText(description, center, metrics.description.top);
       }
 
@@ -362,8 +412,7 @@ export default {
 
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
-
-      ctx.font = this.createFont(metrics.retailPriceText.fontSize);
+      ctx.font = this.createFont(metrics.retailPriceText);
       ctx.fillText(retailPriceText, center, metrics.retailPriceText.top);
 
       // FOOTER WITH BARCODE, PRODUCT CODE AND SEAL
@@ -387,7 +436,7 @@ export default {
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
-      ctx.font = this.createFont(metrics.productCodeText.fontSize);
+      ctx.font = this.createFont(metrics.productCodeText);
       ctx.fillText(
         productCodeText,
         dpi.width - barcode.width / 2 - dpi.vm,
