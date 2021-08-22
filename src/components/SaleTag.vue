@@ -151,8 +151,6 @@ export default {
         const metrics2 = ctx.measureText(testValue);
         ctx.restore();
 
-        console.log({ metrics1, metrics2 });
-
         return (
           (metrics1.actualBoundingBoxAscent +
             metrics1.actualBoundingBoxDescent) /
@@ -175,6 +173,7 @@ export default {
       const retailPrice = this.retailPrice || 0;
       const salePrice = this.salePrice || retailPrice;
       const savings = retailPrice - salePrice;
+      const percentOffSale = this.percentOff ? true : false;
       const percentOff = this.percentOff || (100 * savings) / retailPrice;
 
       const { units, unitCount, unitCost } = computeUnitCost({
@@ -314,6 +313,7 @@ export default {
 
       const result = {
         salesText,
+        percentOffSale,
         percentOff,
         percentOffText,
         brandName,
@@ -351,10 +351,12 @@ export default {
       let offset = dpi.hr1 + dpi.vm;
       metrics.salesText.top = offset;
       offset += metrics.salesText.height;
+      offset += metrics.salesText.height * 0.3;
 
-      offset += metrics.percentOffText.height * 0.3;
-      metrics.percentOffText.top = offset;
-      offset += metrics.percentOffText.height * 0.9;
+      if (percentOffSale) {
+        metrics.percentOffText.top = offset;
+        offset += metrics.percentOffText.height * 0.9;
+      }
 
       const lineHeight = metrics.description.height;
 
@@ -413,6 +415,7 @@ export default {
 
       const {
         salesText,
+        percentOffSale,
         percentOffText,
         brandName,
         description,
@@ -463,11 +466,13 @@ export default {
 
       // PERCENT OFF
 
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
+      if (percentOffSale) {
+        ctx.textBaseline = "top";
+        ctx.textAlign = "center";
 
-      ctx.font = this.createFont(metrics.percentOffText);
-      ctx.fillText(percentOffText, center, metrics.percentOffText.top);
+        ctx.font = this.createFont(metrics.percentOffText);
+        ctx.fillText(percentOffText, center, metrics.percentOffText.top);
+      }
 
       // BRAND
 
