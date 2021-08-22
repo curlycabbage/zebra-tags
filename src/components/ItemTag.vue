@@ -150,8 +150,6 @@ export default {
         const metrics2 = ctx.measureText(testValue);
         ctx.restore();
 
-        console.log({ metrics1, metrics2 });
-
         return (
           (metrics1.actualBoundingBoxAscent +
             metrics1.actualBoundingBoxDescent) /
