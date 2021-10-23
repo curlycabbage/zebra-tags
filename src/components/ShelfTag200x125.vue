@@ -49,6 +49,7 @@ export default {
     isWeighed: Boolean,
     isTaxed: Boolean,
     isOrganic: Boolean,
+    perOunce: Boolean,
     /** dots per millimeter, only 12 works at the moment. */
     dpmm: { type: Number, default: 12 },
     mode: { type: String, default: "canvas" },
@@ -73,6 +74,7 @@ export default {
         vm.isWeighed,
         vm.isTaxed,
         vm.isOrganic,
+        vm.perOunce,
         vm.dpmm,
         vm.lineWidth,
         vm.backgroundColor,
@@ -169,6 +171,7 @@ export default {
       const isTaxed = this.isTaxed ? true : false;
       const isOrganic = this.isOrganic ? true : false;
       const retailPrice = this.retailPrice;
+      const perOunce = this.perOunce;
 
       const productCodeText = formatProductCode(productCode);
 
@@ -176,9 +179,12 @@ export default {
         itemSize,
         price: retailPrice,
         isWeighed,
+        perOunce,
       });
 
-      const retailPriceText = retailPrice.toLocaleString("en-US", {
+      const displayPrice =
+        isWeighed && perOunce ? retailPrice / 16 : retailPrice;
+      const retailPriceText = displayPrice.toLocaleString("en-US", {
         style: "currency",
         currency: "USD",
         minimumFractionDigits: 2,
@@ -350,9 +356,9 @@ export default {
       );
 
       if (isTaxed || isWeighed) {
-        result.retailPriceSubtext = `${isWeighed ? "/LB" : ""}${
-          isTaxed ? "+TX" : ""
-        }`;
+        result.retailPriceSubtext = `${
+          isWeighed ? (perOunce ? "/OZ" : "/LB") : ""
+        }${isTaxed ? "+TX" : ""}`;
         metrics.retailPriceSubtext = {
           fontSize: 28,
           top:

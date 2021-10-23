@@ -10,6 +10,7 @@
           :retailPrice="retailPrice"
           :itemSize="itemSize"
           :isWeighed="isWeighed"
+          :perOunce="perOunce"
           :isTaxed="isTaxed"
           :isOrganic="isOrganic"
           :mode="mode"
@@ -52,6 +53,10 @@
         <div>
           <input id="isWeighed" type="checkbox" v-model="isWeighed" />
           <label for="isWeighed" class="text-base font-sans">Weighed</label>
+        </div>
+        <div>
+          <input id="perOunce" type="checkbox" v-model="perOunce" />
+          <label for="perOunce" class="text-base font-sans">Per Ounce</label>
         </div>
         <div>
           <input id="isTaxed" type="checkbox" v-model="isTaxed" />
@@ -137,6 +142,7 @@ export default {
       retailPrice: 4.79,
       itemSize: "12 OZ",
       isWeighed: false,
+      perOunce: false,
       isTaxed: false,
       isOrganic: false,
       mode: "canvas",

@@ -8,13 +8,19 @@ export function sanitize(value) {
   return "";
 }
 
-export function computeUnitCost({ itemSize, price, isWeighed }) {
+export function computeUnitCost({ itemSize, price, isWeighed, perOunce }) {
   if (isWeighed) {
-    return {
-      units: "OZ",
-      unitCount: 16,
-      unitCost: price / 16,
-    };
+    return perOunce
+      ? {
+          units: "LB",
+          unitCount: 1,
+          unitCost: price,
+        }
+      : {
+          units: "OZ",
+          unitCount: 16,
+          unitCost: price / 16,
+        };
   }
   itemSize = itemSize || "";
   const match = itemSize.match(/^([0-9.]*)(.*)$/);
