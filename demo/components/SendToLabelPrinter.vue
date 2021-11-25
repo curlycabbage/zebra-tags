@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { sendToPrinter, sendToProxy } from "./utils";
+import { sendToPrinter, sendToProxy } from "@/components/utils";
 
 export default {
   props: {

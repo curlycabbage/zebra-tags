@@ -1,5 +1,5 @@
 /** golden ratio */
-export const gr = 1.618;
+export const goldenRatio = 1.618;
 
 export function sanitize(value) {
   if (typeof value === "string") {

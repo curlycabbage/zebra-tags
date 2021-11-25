@@ -60,9 +60,6 @@
     "vue": "^2.6.14",
     "vue-template-compiler": "^2.6.14"
   },
-  "dependencies": {
-    "bwip-js": "^3.0.4"
-  },
   "peerDependencies": {
     "vue": "^2.6.12"
   },

@@ -122,16 +122,13 @@
   </div>
 </template>
 
-<style lang="postcss" scoped>
-@import "./demo.css";
-</style>
-
 <script>
+import "./demo.css";
 import ShelfTag200x125 from "@/components/ShelfTag200x125";
-import CopyToClipboard from "@/components/CopyToClipboard";
-import SendToLabelPrinter from "@/components/SendToLabelPrinter.vue";
 import ImageTag200x125 from "@/components/ImageTag200x125.vue";
-import { getBlankImage } from "../../src/components/utils";
+import { getBlankImage } from "@/components/utils";
+import CopyToClipboard from "./CopyToClipboard";
+import SendToLabelPrinter from "./SendToLabelPrinter";
 
 export default {
   data() {

@@ -34,7 +34,7 @@ import {
   getBlankImage,
   sanitize,
   fetchLabelaryImage,
-  gr,
+  goldenRatio,
 } from "./utils";
 
 export default {
@@ -122,17 +122,17 @@ export default {
 
     /** vertical rule 2 */
     vr2() {
-      return Math.round((192 / gr / 96) * this.dpi);
+      return Math.round((192 / goldenRatio / 96) * this.dpi);
     },
 
     /** horizonal margin */
     hm() {
-      return Math.round((192 / gr ** 7 / 96) * this.dpi);
+      return Math.round((192 / goldenRatio ** 7 / 96) * this.dpi);
     },
 
     /** vertical margin */
     vm() {
-      return Math.round((118 / gr ** 7 / 96) * this.dpi);
+      return Math.round((118 / goldenRatio ** 7 / 96) * this.dpi);
     },
 
     /** width of dividing lines */
@@ -143,18 +143,18 @@ export default {
     /** size of vertical gap used above first line */
     vr1gap() {
       const h = this.hr1;
-      return Math.round(h / gr ** 6);
+      return Math.round(h / goldenRatio ** 6);
     },
 
     /** size of vertical gap used between first and second lines */
     vr2gap() {
       const h = this.hr2 - this.hr1;
-      return Math.round((h - h / gr) / 2);
+      return Math.round((h - h / goldenRatio) / 2);
     },
 
     /** size of vertical gap used below the second line */
     vr3gap() {
-      return Math.round((120 / gr ** 6 / 96) * this.dpi);
+      return Math.round((120 / goldenRatio ** 6 / 96) * this.dpi);
     },
     computedValues() {
       /** width multiplier */
@@ -364,7 +364,7 @@ export default {
           top:
             metrics.retailPriceText.top +
             metrics.retailPriceText.height +
-            (this.hr2 - this.hr1) / gr ** 7,
+            (this.hr2 - this.hr1) / goldenRatio ** 7,
         };
       }
 
