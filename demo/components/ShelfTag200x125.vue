@@ -25,6 +25,7 @@
           <select class="text-base font-sans" v-model.trim="mode">
             <option>canvas</option>
             <option>labelary</option>
+            <option>zpl</option>
           </select>
           <select class="text-base font-sans" v-model.trim="dpmm">
             <option :value="6">6 dpmm</option>
@@ -101,13 +102,7 @@
           <div class="flex flex-col w-48">
             <label class="text-base font-sans mb-1">proxy response</label>
             <div
-              class="
-                bg-gray-50
-                border border-solid
-                font-mono
-                whitespace-pre-line
-                p-2
-              "
+              class="bg-gray-50 border border-solid font-mono whitespace-pre-line p-2"
             >
               {{ proxyResponse || "none" }}
             </div>

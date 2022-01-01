@@ -80,18 +80,12 @@ export default {
         vm.backgroundColor,
         vm.mode,
       ],
-      () => {
-        this.drawTag();
-        this.computeZpl();
-        this.loadImage(500);
-      },
+      () => this.handleChanges(500),
       {
         deep: true,
       }
     );
-    this.drawTag();
-    this.computeZpl();
-    this.loadImage(0);
+    this.handleChanges(0);
   },
   computed: {
     /** dots per inch, converted from dpmm */
@@ -372,6 +366,17 @@ export default {
     },
   },
   methods: {
+    handleChanges(imageDelay) {
+      if (this.mode === "canvas" || this.mode === "labelary") {
+        this.drawTag();
+      }
+      if (this.mode === "zpl" || this.mode === "labelary") {
+        this.computeZpl();
+      }
+      if (this.mode === "labelary") {
+        this.loadImage(imageDelay);
+      }
+    },
     loadImage(delay) {
       this.loading = true;
       clearTimeout(this.timeout);
