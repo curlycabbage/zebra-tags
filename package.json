@@ -1,6 +1,6 @@
 {
   "name": "zebra-tags",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "author": {
     "name": "Peter Radocchia"
   },
@@ -29,7 +29,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "demo": "vue serve .\\demo\\components\\ShelfTag200x125.vue", 
+    "demo": "vue serve .\\demo\\components\\ShelfTag200x125.vue",
     "serve": "vue-cli-service serve dev/serve.js",
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
