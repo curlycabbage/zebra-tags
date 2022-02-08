@@ -163,12 +163,12 @@ export default {
       const brandName = sanitize(this.brandName);
       const description = sanitize(this.description);
       const itemSize = sanitize(this.itemSize);
+      const shelf = sanitize(this.shelf);
       const isWeighed = this.isWeighed ? true : false;
       const isTaxed = this.isTaxed ? true : false;
       const isOrganic = this.isOrganic ? true : false;
       const retailPrice = this.retailPrice;
       const perOunce = this.perOunce;
-      const shelf = this.shelf;
 
       const productCodeText = formatProductCode(productCode);
 
