@@ -50,6 +50,7 @@ export default {
     isTaxed: Boolean,
     isOrganic: Boolean,
     perOunce: Boolean,
+    shelf: String,
     /** dots per millimeter, only 12 works at the moment. */
     dpmm: { type: Number, default: 12 },
     mode: { type: String, default: "canvas" },
@@ -79,6 +80,7 @@ export default {
         vm.lineWidth,
         vm.backgroundColor,
         vm.mode,
+        vm.shelf,
       ],
       () => this.handleChanges(500),
       {
@@ -166,6 +168,7 @@ export default {
       const isOrganic = this.isOrganic ? true : false;
       const retailPrice = this.retailPrice;
       const perOunce = this.perOunce;
+      const shelf = this.shelf;
 
       const productCodeText = formatProductCode(productCode);
 
@@ -240,6 +243,10 @@ export default {
           maxFontSize: 40,
           maxWidth: this.vr2 - this.hm * 2,
         },
+        shelf: {
+          maxFontSize: 40,
+          maxWidth: this.width - this.vr2 - this.hm * 2,
+        },
         brandName: {
           minFontSize: 50,
           maxWidth: this.vr2 - this.hm * 2,
@@ -269,6 +276,7 @@ export default {
         itemSizeText,
         retailPrice,
         retailPriceText,
+        shelf,
         isWeighed,
         isTaxed,
         isOrganic,
@@ -326,6 +334,8 @@ export default {
       metrics.productCodeText.top = Math.round(
         this.hr1 - this.vr1gap - metrics.productCodeText.height
       );
+
+      metrics.shelf.top = this.vm / 2;
 
       metrics.brandName.top = Math.round(
         this.hr1 + (this.hr2 - this.hr1 - metrics.brandName.height) / 2
@@ -441,6 +451,7 @@ export default {
         unitCostText,
         retailPriceText,
         retailPriceSubtext,
+        shelf,
         isOrganic,
         metrics,
       } = this.computedValues;
@@ -499,6 +510,13 @@ export default {
 ^FD${productCodeText}\\&
 ^FS
 
+^FX shelf ^FS
+^FO${this.vr2},${metrics.shelf.top}
+^FB${this.width - this.vr2 - this.hm},2,,R,
+^A0,${metrics.shelf.fontSize}
+^FD${shelf}\\&
+^FS
+
 ^FX item size ^FS
 ^FO${this.vr2},${metrics.itemSizeText.top}
 ^FB${this.width - this.vr2 - this.hm},2,,R,
@@ -553,6 +571,7 @@ ${backgroundZpl}
         itemSizeText,
         unitCostText,
         isTaxedText,
+        shelf,
         metrics,
         ctx,
         canvas,
@@ -588,6 +607,14 @@ ${backgroundZpl}
 
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
       ctx.fillText(productCodeText, this.vr2 / 2, metrics.productCodeText.top);
+
+      // LOCATION
+
+      ctx.textBaseline = "top";
+      ctx.textAlign = "right";
+
+      ctx.font = this.createFont(metrics.shelf.fontSize);
+      ctx.fillText(shelf, this.width - this.hm, metrics.shelf.top);
 
       // ITEM SIZE
 

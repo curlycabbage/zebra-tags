@@ -13,6 +13,7 @@
           :perOunce="perOunce"
           :isTaxed="isTaxed"
           :isOrganic="isOrganic"
+          :shelf="shelf"
           :mode="mode"
           :dpmm="dpmm"
           :backgroundColor="backgroundColor"
@@ -66,6 +67,9 @@
         <div>
           <input id="isOrganic" type="checkbox" v-model="isOrganic" />
           <label for="isOrganic" class="text-base font-sans">Organic</label>
+        </div>
+        <div>
+          <input class="text-base font-sans" v-model.trim="shelf" />
         </div>
       </form>
     </div>
@@ -137,6 +141,7 @@ export default {
       perOunce: false,
       isTaxed: false,
       isOrganic: false,
+      shelf: "700.10",
       mode: "canvas",
       dpmm: 12,
       zpl: undefined,
