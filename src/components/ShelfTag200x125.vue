@@ -20,7 +20,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap");
 
 .canvas {
-  height: 1.25in;
+  height: 1.26in;
   width: 2in;
   display: block;
 }
@@ -103,7 +103,7 @@ export default {
 
     /** overall height */
     height() {
-      return Math.round((120 / 96) * this.dpi);
+      return Math.round((122 / 96) * this.dpi);
     },
 
     /** horizontal rule 1 */
@@ -128,7 +128,7 @@ export default {
 
     /** vertical margin */
     vm() {
-      return Math.round((120 / goldenRatio ** 7 / 96) * this.dpi);
+      return Math.round((122 / goldenRatio ** 7 / 96) * this.dpi);
     },
 
     /** width of dividing lines */
@@ -150,7 +150,7 @@ export default {
 
     /** size of vertical gap used below the second line */
     vr3gap() {
-      return Math.round((120 / goldenRatio ** 6 / 96) * this.dpi);
+      return Math.round((122 / goldenRatio ** 6 / 96) * this.dpi);
     },
     computedValues() {
       /** width multiplier */
