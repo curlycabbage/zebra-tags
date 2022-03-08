@@ -4,7 +4,7 @@
 
 <style lang="css" scoped>
 .image {
-  height: 1.24in;
+  height: 1.25in;
   width: 2in;
   object-fit: contain;
   display: block;
