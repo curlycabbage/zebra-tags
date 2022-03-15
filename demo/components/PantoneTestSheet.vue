@@ -11,7 +11,7 @@
 
 <style lang="postcss" scoped>
 .grid {
-  padding-top: 1.26in;
+  padding-top: 1.27in;
   display: grid;
   width: 8in;
   grid-template-columns: repeat(4, auto);

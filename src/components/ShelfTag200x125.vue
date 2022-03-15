@@ -20,7 +20,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap");
 
 .canvas {
-  height: 1.26in;
+  height: 1.27in;
   width: 2in;
   display: block;
 }
@@ -62,6 +62,10 @@ export default {
       zpl: undefined,
       src: getBlankImage(),
       loading: false,
+      inch: {
+        height: 1.27,
+        width: 2,
+      },
     };
   },
   mounted() {
@@ -98,12 +102,12 @@ export default {
     // key dimensions in pixels, converted to DPI
     /** overall width */
     width() {
-      return Math.round((192 / 96) * this.dpi);
+      return Math.round(this.inch.width * this.dpi);
     },
 
     /** overall height */
     height() {
-      return Math.round((122 / 96) * this.dpi);
+      return Math.round(this.inch.height * this.dpi);
     },
 
     /** horizontal rule 1 */
@@ -118,17 +122,17 @@ export default {
 
     /** vertical rule 2 */
     vr2() {
-      return Math.round((192 / goldenRatio / 96) * this.dpi);
+      return Math.round((this.inch.width / goldenRatio) * this.dpi);
     },
 
     /** horizonal margin */
     hm() {
-      return Math.round((192 / goldenRatio ** 7 / 96) * this.dpi);
+      return Math.round((this.inch.width / goldenRatio ** 7) * this.dpi);
     },
 
     /** vertical margin */
     vm() {
-      return Math.round((122 / goldenRatio ** 7 / 96) * this.dpi);
+      return Math.round((this.inch.height / goldenRatio ** 7) * this.dpi);
     },
 
     /** width of dividing lines */
@@ -139,7 +143,7 @@ export default {
     /** size of vertical gap used above first line */
     vr1gap() {
       const h = this.hr1;
-      return Math.round(h / goldenRatio ** 6);
+      return Math.round(h / goldenRatio ** 7);
     },
 
     /** size of vertical gap used between first and second lines */
@@ -150,7 +154,7 @@ export default {
 
     /** size of vertical gap used below the second line */
     vr3gap() {
-      return Math.round((122 / goldenRatio ** 6 / 96) * this.dpi);
+      return Math.round((this.inch.height / goldenRatio ** 6) * this.dpi);
     },
     computedValues() {
       /** width multiplier */
@@ -407,8 +411,8 @@ export default {
         const zpl = this.zpl;
         const data = await fetchLabelaryImage(zpl, {
           dpmm: this.dpmm,
-          width: 2,
-          height: 1.24,
+          width: this.inch.width,
+          height: this.inch.height,
           index: 0,
           signal,
         });
