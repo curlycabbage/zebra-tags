@@ -8,6 +8,7 @@
           :brandName="brandName"
           :description="description"
           :retailPrice="retailPrice"
+          :quantity="quantity"
           :itemSize="itemSize"
           :isWeighed="isWeighed"
           :perOunce="perOunce"
@@ -48,6 +49,9 @@
         </div>
         <div>
           <input class="text-base font-sans" v-model.trim="itemSize" />
+        </div>
+        <div>
+          <input class="text-base font-sans" v-model.trim="quantity" />
         </div>
         <div>
           <input class="text-base font-sans" v-model.number="retailPrice" />
@@ -137,6 +141,7 @@ export default {
       description: "Spinach Fettuccini",
       retailPrice: 4.79,
       itemSize: "12 OZ",
+      quantity: 1,
       isWeighed: false,
       perOunce: false,
       isTaxed: false,

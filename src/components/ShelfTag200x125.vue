@@ -45,6 +45,7 @@ export default {
     brandName: String,
     description: String,
     itemSize: String,
+    quantity: { type: Number, default: 1 },
     retailPrice: Number,
     isWeighed: Boolean,
     isTaxed: Boolean,
@@ -75,6 +76,7 @@ export default {
         vm.brandName,
         vm.description,
         vm.itemSize,
+        vm.quantity,
         vm.retailPrice,
         vm.isWeighed,
         vm.isTaxed,
@@ -167,6 +169,7 @@ export default {
       const brandName = sanitize(this.brandName);
       const description = sanitize(this.description);
       const itemSize = sanitize(this.itemSize);
+      const quantity = this.quantity || 1;
       const shelf = sanitize(this.shelf);
       const isWeighed = this.isWeighed ? true : false;
       const isTaxed = this.isTaxed ? true : false;
@@ -193,7 +196,11 @@ export default {
       });
 
       const itemSizeText =
-        !itemSize || isWeighed ? "" : `${unitCount} ${units}`;
+        !itemSize || isWeighed
+          ? ""
+          : quantity > 1
+          ? `${quantity}/${unitCount} ${units}`
+          : `${unitCount} ${units}`;
 
       const unitCostText =
         !itemSize && !isWeighed
