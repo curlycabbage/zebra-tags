@@ -182,7 +182,7 @@ export default {
           maxWidth: this.vr1 - this.hm * 2,
         },
         brandName: {
-          minFontSize: 50,
+          minFontSize: 40,
           maxWidth: this.width - this.vr1 - this.hm * 2,
         },
         description: {
@@ -249,14 +249,14 @@ export default {
       }
 
       metrics.productCodeText.top = Math.round(
-        this.hr1 - this.gap - metrics.productCodeText.height
+        this.hr1 - this.vm * 3 - metrics.productCodeText.height
       );
 
       metrics.brandName.top = Math.round(
-        this.hr1 - this.vm * 2 - metrics.brandName.height
+        this.hr1 - this.vm * 3 - metrics.brandName.height
       );
 
-      metrics.description.top = Math.round(this.hr1 + this.vm * 2);
+      metrics.description.top = Math.round(this.hr1 + this.vm);
 
       console.log(metrics.brandName);
       console.log(result.brandName);
@@ -342,13 +342,10 @@ export default {
 ^PW${this.width}
 ^LL${this.height}
 
-^FX horizontal lines ^FS
-^FO0,${this.hr1}^GB${this.width},${this.lineWidth},${this.lineWidth}^FS
-
 ^FX barcode ^FS
 ^FO${this.hm},0
 ^BY3
-^BCN,90,N,,,A
+^BCN,70,N,,,A
 ^FD${productCode}
 ^FS
 
@@ -390,11 +387,6 @@ ${backgroundZpl}
       // set line stroke and line width
       ctx.strokeStyle = "black";
       ctx.lineWidth = this.lineWidth;
-
-      ctx.beginPath();
-      ctx.moveTo(0, this.hr1);
-      ctx.lineTo(this.width, this.hr1);
-      ctx.stroke();
 
       // PRODUCT CODE
 
