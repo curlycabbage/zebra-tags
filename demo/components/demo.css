@@ -14,6 +14,10 @@
   margin-bottom: 0.25rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .whitespace-pre-line {
   white-space: pre-line;
 }
@@ -64,4 +68,12 @@
 
 .bg-gray-50 {
   background-color: rgba(243, 244, 246);
+}
+
+.bg-blue-700 {
+  background-color: rgb(29 78 216)
+}
+
+.text-white	{
+  color: rgb(255 255 255)
 }
