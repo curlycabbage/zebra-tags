@@ -2,19 +2,11 @@
   <div class="flex gap-4">
     <div class="flex flex-col gap-4">
       <div>
-        <ShelfTag200x075
+        <ItemTag200x075
           class="border border-dotted"
           :productCode="productCode"
           :brandName="brandName"
           :description="description"
-          :retailPrice="retailPrice"
-          :quantity="quantity"
-          :itemSize="itemSize"
-          :isWeighed="isWeighed"
-          :perOunce="perOunce"
-          :isTaxed="isTaxed"
-          :isOrganic="isOrganic"
-          :shelf="shelf"
           :mode="mode"
           :dpmm="dpmm"
           :backgroundColor="backgroundColor"
@@ -46,34 +38,6 @@
         </div>
         <div>
           <input class="text-base font-sans" v-model.trim="description" />
-        </div>
-        <div>
-          <input class="text-base font-sans" v-model.trim="itemSize" />
-        </div>
-        <div>
-          <input class="text-base font-sans" v-model.trim="quantity" />
-        </div>
-        <div>
-          <input class="text-base font-sans" v-model.number="retailPrice" />
-        </div>
-        <div>
-          <input id="isWeighed" type="checkbox" v-model="isWeighed" />
-          <label for="isWeighed" class="text-base font-sans">Weighed</label>
-        </div>
-        <div>
-          <input id="perOunce" type="checkbox" v-model="perOunce" />
-          <label for="perOunce" class="text-base font-sans">Per Ounce</label>
-        </div>
-        <div>
-          <input id="isTaxed" type="checkbox" v-model="isTaxed" />
-          <label for="isTaxed" class="text-base font-sans">Taxed</label>
-        </div>
-        <div>
-          <input id="isOrganic" type="checkbox" v-model="isOrganic" />
-          <label for="isOrganic" class="text-base font-sans">Organic</label>
-        </div>
-        <div>
-          <input class="text-base font-sans" v-model.trim="shelf" />
         </div>
       </form>
     </div>
@@ -127,7 +91,7 @@
 
 <script>
 import "./demo.css";
-import ShelfTag200x075 from "@/components/ShelfTag200x075";
+import ItemTag200x075 from "@/components/ItemTag200x075";
 import ImageTag200x075 from "@/components/ImageTag200x075.vue";
 import { getBlankImage } from "@/components/utils";
 import CopyToClipboard from "./CopyToClipboard";
@@ -139,14 +103,6 @@ export default {
       productCode: "015532000039",
       brandName: "Montebello",
       description: "Spinach Fettuccini",
-      retailPrice: 4.79,
-      itemSize: "12 OZ",
-      quantity: 1,
-      isWeighed: false,
-      perOunce: false,
-      isTaxed: false,
-      isOrganic: false,
-      shelf: "700.10",
       mode: "canvas",
       dpmm: 12,
       zpl: undefined,
@@ -157,7 +113,7 @@ export default {
     };
   },
   components: {
-    ShelfTag200x075,
+    ItemTag200x075,
     CopyToClipboard,
     SendToLabelPrinter,
     ImageTag200x075,

@@ -310,6 +310,11 @@ export default {
       // if brandName has overflown max width, split into two lines.
       if (metrics.brandName.width > metrics.brandName.maxWidth) {
         const segments = brandName.split(" ");
+        if (segments.length === 1) {
+          const halfway = Math.round(brandName.length / 2);
+          segments[0] = brandName.substring(0, halfway);
+          segments[1] = brandName.substring(halfway);
+        }
         let brand1 = "";
         let brand2 = brandName;
         let lastGap = 0 - ctx.measureText(brand2).width;

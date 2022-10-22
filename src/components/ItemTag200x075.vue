@@ -37,18 +37,12 @@ import {
 } from "./utils";
 
 export default {
-  name: "ShelfTag200x075",
+  name: "ItemTag200x075",
   components: { ImageTag200x075 },
   props: {
     productCode: String,
     brandName: String,
     description: String,
-    quantity: { type: Number, default: 1 },
-    retailPrice: Number,
-    isWeighed: Boolean,
-    isTaxed: Boolean,
-    isOrganic: Boolean,
-    perOunce: Boolean,
     /** dots per millimeter, only 12 works at the moment. */
     dpmm: { type: Number, default: 12 },
     mode: { type: String, default: "canvas" },
@@ -72,12 +66,6 @@ export default {
         vm.productCode,
         vm.brandName,
         vm.description,
-        vm.quantity,
-        vm.retailPrice,
-        vm.isWeighed,
-        vm.isTaxed,
-        vm.isOrganic,
-        vm.perOunce,
         vm.dpmm,
         vm.lineWidth,
         vm.backgroundColor,
@@ -148,22 +136,8 @@ export default {
       const productCode = sanitize(this.productCode);
       const brandName = sanitize(this.brandName);
       const description = sanitize(this.description);
-      const isWeighed = this.isWeighed ? true : false;
-      const isTaxed = this.isTaxed ? true : false;
-      const isOrganic = this.isOrganic ? true : false;
-      const retailPrice = this.retailPrice;
-      const perOunce = this.perOunce;
 
       const productCodeText = formatProductCode(productCode);
-
-      const displayPrice =
-        isWeighed && perOunce ? retailPrice / 16 : retailPrice;
-      const retailPriceText = displayPrice.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
 
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext("2d");
@@ -209,13 +183,10 @@ export default {
         },
         brandName: {
           minFontSize: 50,
-          maxWidth: this.width - this.hm * 2,
+          maxWidth: this.width - this.vr1 - this.hm * 2,
         },
         description: {
           maxWidth: this.width - this.hm * 2,
-        },
-        retailPriceText: {
-          maxWidth: this.width - this.vr1 - this.hm * 2,
         },
       };
 
@@ -224,11 +195,6 @@ export default {
         productCodeText,
         brandName,
         description,
-        retailPrice,
-        retailPriceText,
-        isWeighed,
-        isTaxed,
-        isOrganic,
         metrics,
         canvas,
         ctx,
@@ -244,6 +210,11 @@ export default {
       // if brandName has overflown max width, split into two lines.
       if (metrics.brandName.width > metrics.brandName.maxWidth) {
         const segments = brandName.split(" ");
+        if (segments.length === 1) {
+          const halfway = Math.round(brandName.length / 2);
+          segments[0] = brandName.substring(0, halfway);
+          segments[1] = brandName.substring(halfway);
+        }
         let brand1 = "";
         let brand2 = brandName;
         let lastGap = 0 - ctx.measureText(brand2).width;
@@ -267,6 +238,7 @@ export default {
           lastGap = currGap;
         }
         result.brandName = `${brand1}\n${brand2}`;
+        console.log({ longerValue });
         const derived = deriveMetrics(longerValue, {
           maxWidth: metrics.brandName.maxWidth,
           maxFontSize: 56,
@@ -281,26 +253,13 @@ export default {
       );
 
       metrics.brandName.top = Math.round(
-        this.hr1 + (this.height - this.hr1 - metrics.brandName.height) / 2
+        this.hr1 - this.vm * 2 - metrics.brandName.height
       );
 
-      metrics.retailPriceText.top = Math.round(this.hr1 / 2);
+      metrics.description.top = Math.round(this.hr1 + this.vm * 2);
 
-      metrics.description.top = Math.round(this.height + this.gap);
-
-      if (isTaxed || isWeighed) {
-        result.retailPriceSubtext = `${
-          isWeighed ? (perOunce ? "/OZ" : "/LB") : ""
-        }${isTaxed ? "+TX" : ""}`;
-        metrics.retailPriceSubtext = {
-          fontSize: 28,
-          top:
-            metrics.retailPriceText.top +
-            metrics.retailPriceText.height +
-            (this.height - this.hr1) / goldenRatio ** 7,
-        };
-      }
-
+      console.log(metrics.brandName);
+      console.log(result.brandName);
       return result;
     },
   },
@@ -371,41 +330,11 @@ export default {
       return { r: 255, g: 255, b: 255 };
     },
     computeZpl() {
-      const {
-        productCode,
-        productCodeText,
-        brandName,
-        description,
-        retailPriceText,
-        retailPriceSubtext,
-        isOrganic,
-        metrics,
-      } = this.computedValues;
+      const { productCode, productCodeText, brandName, description, metrics } =
+        this.computedValues;
 
       const { r, g, b } = this.computeRbg();
       const backgroundZpl = `~BR0,0,${this.width},${this.height},${r},${g},${b}`;
-
-      const isOrganicZpl = !isOrganic
-        ? ""
-        : `
-^FO${this.vr1 - 25},${this.hr1 - 60}
-^GFA,350,350,7,K07FC,J07IF8,I03F003F,I0F8I07C,001CK0E,0078K078,00EL01C,01CM0E,038M07,
-07N038,06N018,0CO0C,1CO0E,180CCE7C3006,300CDB7E3803,300CDB667803,300CDC667803,
-600CCEI68018,600CC7I6C018,600CD366FC018,C00CDB76EC00C,C0079F7ECC00C,C00104L0C,CQ0C,
-:DPFEC,CPFCC,:CF842189287CC,4FA42088093CC,6F20278829FD8,6F04212821FD8,6324210029398,
-37842001083B,338DA0212C73,33OF3,19NFE6,1DNFEE,0CF7LFCC,063MF98,073KFBF38,039LFE7,
-01CLFCE,00E3EJF1C,0078JFC78,001C3IF0E,I0F80407C,I03F003F,J07IF8,K0FF8,
-^FS`;
-
-      const retailPriceSubtextZpl = !retailPriceSubtext
-        ? ""
-        : `
-^FX isTaxed ^FS
-^FO${this.vr1},${metrics.retailPriceSubtext.top}
-^FB${this.width - this.vr1 - this.hm},2,,R,
-^A0,${metrics.retailPriceSubtext.fontSize}
-^FD${retailPriceSubtext}\\&
-^FS`;
 
       const value = `^XA
 ^CI28
@@ -430,18 +359,9 @@ export default {
 ^FD${productCodeText}\\&
 ^FS
 
-^FX retailPrice ^FS
-^FO${this.vr1},${metrics.retailPriceText.top}
-^FB${this.width - this.vr1 - this.hm},2,,R,
-^A0,${metrics.retailPriceText.fontSize}
-^FD${retailPriceText}\\&
-^FS
-
-${retailPriceSubtextZpl}
-
 ^FX text1 ^FS
-^FO0,${metrics.brandName.top}
-^FB${this.vr1},2,,C,
+^FO${this.vr1},${metrics.brandName.top}
+^FB${this.width - this.vr1},2,,C,
 ^A0,${metrics.brandName.fontSize}
 ^FD${brandName.replace("\n", "\\&")}\\&
 ^FS
@@ -453,8 +373,6 @@ ${retailPriceSubtextZpl}
 ^FD${description}\\&
 ^FS
 
-${isOrganicZpl}
-
 ${backgroundZpl}
 
 ^XZ`;
@@ -462,16 +380,8 @@ ${backgroundZpl}
       this.$emit("zpl", value);
     },
     drawTag() {
-      const {
-        productCodeText,
-        brandName,
-        description,
-        retailPriceText,
-        isTaxedText,
-        metrics,
-        ctx,
-        canvas,
-      } = this.computedValues;
+      const { productCodeText, brandName, description, metrics, ctx, canvas } =
+        this.computedValues;
 
       ctx.save();
 
@@ -494,39 +404,25 @@ ${backgroundZpl}
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
       ctx.fillText(productCodeText, this.vr1 / 2, metrics.productCodeText.top);
 
-      // retailPrice
-
-      ctx.textBaseline = "top";
-      ctx.textAlign = "right";
-
-      ctx.font = this.createFont(metrics.retailPriceText.fontSize);
-      ctx.fillText(
-        retailPriceText,
-        this.width - this.hm,
-        metrics.retailPriceText.top
-      );
-
-      // TAX
-
-      if (isTaxedText) {
-        ctx.textBaseline = "top";
-        ctx.textAlign = "right";
-
-        ctx.font = this.createFont(metrics.isTaxedText.fontSize);
-        ctx.fillText(
-          isTaxedText,
-          this.width - this.hm,
-          metrics.isTaxedText.top
-        );
-      }
-
       // BRAND
 
       ctx.textBaseline = "top";
       ctx.textAlign = "center";
 
-      ctx.font = this.createFont(metrics.brandName.fontSize);
-      ctx.fillText(brandName, this.width / 2, metrics.brandName.top);
+      const brandLines = brandName.split("\n");
+      const brandX = this.vr1 + (this.width - this.vr1) / 2;
+      if (brandLines.length > 1) {
+        ctx.font = this.createFont(metrics.brandName.fontSize);
+        ctx.fillText(brandLines[0], brandX, metrics.brandName.top);
+        ctx.fillText(
+          brandLines[1],
+          brandX,
+          metrics.brandName.top + metrics.brandName.height / 2
+        );
+      } else {
+        ctx.font = this.createFont(metrics.brandName.fontSize);
+        ctx.fillText(brandName, brandX, metrics.brandName.top);
+      }
 
       // DESCRIPTION
 
