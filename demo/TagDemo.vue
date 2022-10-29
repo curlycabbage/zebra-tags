@@ -19,12 +19,12 @@
 <style scoped></style>
 
 <script>
-import ItemTag200x075 from "./components/ItemTag200x075.vue";
+import ItemTag200x050 from "./components/ItemTag200x050.vue";
 import ShelfTag200x125 from "./components/ShelfTag200x125.vue";
 import PantoneTestSheet from "./components/PantoneTestSheet.vue";
 
 const components = {
-  ItemTag200x075,
+  ItemTag200x050,
   ShelfTag200x125,
   PantoneTestSheet,
 };

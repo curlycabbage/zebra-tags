@@ -2,7 +2,7 @@
   <div class="flex gap-4">
     <div class="flex flex-col gap-4">
       <div>
-        <ItemTag200x075
+        <ItemTag200x050
           class="border border-dotted"
           :productCode="productCode"
           :brandName="brandName"
@@ -42,7 +42,7 @@
       </form>
     </div>
     <div class="flex flex-col gap-4">
-      <ImageTag200x075 class="border border-dotted" :src="src" />
+      <ImageTag200x050 class="border border-dotted" :src="src" />
       <div class="flex flex-col gap-2">
         <div class="flex gap-2">
           <SendToLabelPrinter
@@ -91,8 +91,8 @@
 
 <script>
 import "./demo.css";
-import ItemTag200x075 from "@/components/ItemTag200x075";
-import ImageTag200x075 from "@/components/ImageTag200x075.vue";
+import ItemTag200x050 from "@/components/ItemTag200x050";
+import ImageTag200x050 from "@/components/ImageTag200x050.vue";
 import { getBlankImage } from "@/components/utils";
 import CopyToClipboard from "./CopyToClipboard";
 import SendToLabelPrinter from "./SendToLabelPrinter";
@@ -100,9 +100,9 @@ import SendToLabelPrinter from "./SendToLabelPrinter";
 export default {
   data() {
     return {
-      productCode: "015532000039",
-      brandName: "Montebello",
-      description: "Spinach Fettuccini",
+      productCode: "33272",
+      brandName: "L Olio Giovanni",
+      description: "Olio Giovanni Extravergine",
       mode: "canvas",
       dpmm: 12,
       zpl: undefined,
@@ -113,10 +113,10 @@ export default {
     };
   },
   components: {
-    ItemTag200x075,
+    ItemTag200x050,
     CopyToClipboard,
     SendToLabelPrinter,
-    ImageTag200x075,
+    ImageTag200x050,
   },
 };
 </script>

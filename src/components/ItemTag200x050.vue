@@ -8,7 +8,7 @@
       :width="width"
       :height="height"
     />
-    <ImageTag200x075
+    <ImageTag200x050
       v-show="mode === 'labelary'"
       :src="src"
       :style="backgroundColor ? `background-color: ${backgroundColor}` : ''"
@@ -20,14 +20,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap");
 
 .canvas {
-  height: 0.75in;
+  height: 0.5in;
   width: 2in;
   display: block;
 }
 </style>
 
 <script>
-import ImageTag200x075 from "./ImageTag200x075.vue";
+import ImageTag200x050 from "./ImageTag200x050.vue";
 import {
   formatProductCode,
   getBlankImage,
@@ -37,8 +37,8 @@ import {
 } from "./utils";
 
 export default {
-  name: "ItemTag200x075",
-  components: { ImageTag200x075 },
+  name: "ItemTag200x050",
+  components: { ImageTag200x050 },
   props: {
     productCode: String,
     brandName: String,
@@ -55,7 +55,7 @@ export default {
       src: getBlankImage(),
       loading: false,
       inch: {
-        height: 0.75,
+        height: 0.5,
         width: 2,
       },
     };
@@ -97,17 +97,17 @@ export default {
 
     /** horizontal rule 1 */
     hr1() {
-      return Math.round((44 / 96) * this.dpi);
+      return Math.round((30 / 96) * this.dpi);
     },
 
     /** vertical rule 1 */
     vr1() {
-      return Math.round((this.inch.width / goldenRatio) * this.dpi);
+      return Math.round(1.1 * this.dpi);
     },
 
     /** horizonal margin */
     hm() {
-      return Math.round((this.inch.width / goldenRatio ** 7) * this.dpi);
+      return Math.round((this.inch.width / goldenRatio ** 8) * this.dpi);
     },
 
     /** vertical margin */
@@ -178,15 +178,19 @@ export default {
 
       const metrics = {
         productCodeText: {
-          maxFontSize: 40,
-          maxWidth: this.vr1 - this.hm * 2,
+          maxFontSize: 36,
+          minFontSize: 36,
+          maxWidth: this.vr1,
         },
         brandName: {
-          minFontSize: 40,
-          maxWidth: this.width - this.vr1 - this.hm * 2,
+          maxFontSize: 42,
+          minFontSize: 24,
+          maxWidth: this.vr1,
         },
         description: {
-          maxWidth: this.width - this.hm * 2,
+          maxFontSize: 48,
+          minFontSize: 24,
+          maxWidth: this.width,
         },
       };
 
@@ -207,59 +211,14 @@ export default {
         Object.assign(m, d);
       });
 
-      // if brandName has overflown max width, split into two lines.
-      if (metrics.brandName.width > metrics.brandName.maxWidth) {
-        const segments = brandName.split(" ");
-        if (segments.length === 1) {
-          const halfway = Math.round(brandName.length / 2);
-          segments[0] = brandName.substring(0, halfway);
-          segments[1] = brandName.substring(halfway);
-        }
-        let brand1 = "";
-        let brand2 = brandName;
-        let lastGap = 0 - ctx.measureText(brand2).width;
-        let longerValue = brandName;
-        // split brandName into two lines of approximately equal length
-        for (let i = 0, n = segments.length; i < n; i++) {
-          brand1 = segments.slice(0, i + 1).join(" ");
-          brand2 = segments.slice(i + 1).join(" ");
-          const m1 = ctx.measureText(brand1);
-          const m2 = ctx.measureText(brand2);
-          const currGap = m1.width - m2.width;
-          if (currGap > 0) {
-            longerValue = brand1;
-            if (Math.abs(currGap) > Math.abs(lastGap)) {
-              brand1 = segments.slice(0, i).join(" ");
-              brand2 = segments.slice(i).join(" ");
-              longerValue = brand2;
-            }
-            break;
-          }
-          lastGap = currGap;
-        }
-        result.brandName = `${brand1}\n${brand2}`;
-        console.log({ longerValue });
-        const derived = deriveMetrics(longerValue, {
-          maxWidth: metrics.brandName.maxWidth,
-          maxFontSize: 56,
-          minFontSize: metrics.brandName.minFontSize,
-        });
-        Object.assign(metrics.brandName, derived);
-        metrics.brandName.height = metrics.brandName.height * 2.3;
-      }
-
-      metrics.productCodeText.top = Math.round(
-        this.hr1 - this.vm * 3 - metrics.productCodeText.height
-      );
+      metrics.productCodeText.top = this.vm * 2;
 
       metrics.brandName.top = Math.round(
-        this.hr1 - this.vm * 3 - metrics.brandName.height
+        this.hr1 - this.vm - metrics.brandName.height
       );
 
       metrics.description.top = Math.round(this.hr1 + this.vm);
 
-      console.log(metrics.brandName);
-      console.log(result.brandName);
       return result;
     },
   },
@@ -343,29 +302,29 @@ export default {
 ^LL${this.height}
 
 ^FX barcode ^FS
-^FO${this.hm},0
+^FO${this.width - this.hm},0,1
 ^BY3
 ^BCN,70,N,,,A
 ^FD${productCode}
 ^FS
 
 ^FX product code ^FS
-^FO0,${metrics.productCodeText.top}
-^FB${this.vr1},2,,C,
+^FO${this.hm},${metrics.productCodeText.top},0
+^FB${this.vr1},2,,L,
 ^A0,${metrics.productCodeText.fontSize}
 ^FD${productCodeText}\\&
 ^FS
 
 ^FX text1 ^FS
-^FO${this.vr1},${metrics.brandName.top}
-^FB${this.width - this.vr1},2,,C,
+^FO${this.hm},${metrics.brandName.top}
+^FB${this.vr1},2,,L,
 ^A0,${metrics.brandName.fontSize}
 ^FD${brandName.replace("\n", "\\&")}\\&
 ^FS
 
 ^FX text2 ^FS
-^FO0,${metrics.description.top}
-^FB${this.width},2,,C,
+^FO${this.hm},${metrics.description.top}
+^FB${this.width},2,,L,
 ^A0,${metrics.description.fontSize}
 ^FD${description}\\&
 ^FS
@@ -391,38 +350,26 @@ ${backgroundZpl}
       // PRODUCT CODE
 
       ctx.textBaseline = "top";
-      ctx.textAlign = "center";
+      ctx.textAlign = "left";
 
       ctx.font = this.createFont(metrics.productCodeText.fontSize);
-      ctx.fillText(productCodeText, this.vr1 / 2, metrics.productCodeText.top);
+      ctx.fillText(productCodeText, this.hm, metrics.productCodeText.top);
 
       // BRAND
 
       ctx.textBaseline = "top";
-      ctx.textAlign = "center";
+      ctx.textAlign = "left";
 
-      const brandLines = brandName.split("\n");
-      const brandX = this.vr1 + (this.width - this.vr1) / 2;
-      if (brandLines.length > 1) {
-        ctx.font = this.createFont(metrics.brandName.fontSize);
-        ctx.fillText(brandLines[0], brandX, metrics.brandName.top);
-        ctx.fillText(
-          brandLines[1],
-          brandX,
-          metrics.brandName.top + metrics.brandName.height / 2
-        );
-      } else {
-        ctx.font = this.createFont(metrics.brandName.fontSize);
-        ctx.fillText(brandName, brandX, metrics.brandName.top);
-      }
+      ctx.font = this.createFont(metrics.brandName.fontSize);
+      ctx.fillText(brandName, this.hm, metrics.brandName.top);
 
       // DESCRIPTION
 
       ctx.textBaseline = "top";
-      ctx.textAlign = "center";
+      ctx.textAlign = "left";
 
       ctx.font = this.createFont(metrics.description.fontSize);
-      ctx.fillText(description, this.width / 2, metrics.description.top);
+      ctx.fillText(description, this.hm, metrics.description.top);
 
       ctx.restore();
 

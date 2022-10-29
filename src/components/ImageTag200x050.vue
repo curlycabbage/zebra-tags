@@ -4,7 +4,7 @@
 
 <style lang="css" scoped>
 .image {
-  height: 0.75in;
+  height: 0.5in;
   width: 2in;
   object-fit: contain;
   display: block;
@@ -16,7 +16,7 @@ export default {
   props: {
     src: String,
   },
-  name: "ImageTag200x075",
+  name: "ImageTag200x050",
   watch: {
     src() {
       this.bindImage();
