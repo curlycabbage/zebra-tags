@@ -107,7 +107,7 @@ export default {
 
     /** horizonal margin */
     hm() {
-      return Math.round((this.inch.width / goldenRatio ** 8) * this.dpi);
+      return Math.round((this.inch.width / goldenRatio ** 7) * this.dpi);
     },
 
     /** vertical margin */
