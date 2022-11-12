@@ -44,6 +44,7 @@ export default {
     productCode: String,
     brandName: String,
     description: String,
+    countryOfOrigin: String,
     itemSize: String,
     quantity: { type: Number, default: 1 },
     retailPrice: Number,
@@ -75,6 +76,7 @@ export default {
         vm.productCode,
         vm.brandName,
         vm.description,
+        vm.countryOfOrigin,
         vm.itemSize,
         vm.quantity,
         vm.retailPrice,
@@ -114,12 +116,12 @@ export default {
 
     /** horizontal rule 1 */
     hr1() {
-      return Math.round((44 / 96) * this.dpi);
+      return Math.round((40 / 96) * this.dpi);
     },
 
     /** horizontal rule 2 */
     hr2() {
-      return Math.round((84 / 96) * this.dpi);
+      return Math.round((80 / 96) * this.dpi);
     },
 
     /** vertical rule 2 */
@@ -148,6 +150,12 @@ export default {
       return Math.round(h / goldenRatio ** 7);
     },
 
+    /** size of vertical gap used between lines */
+    linegap() {
+      const h = this.hr1;
+      return Math.round(h / goldenRatio ** 10);
+    },
+
     /** size of vertical gap used between first and second lines */
     vr2gap() {
       const h = this.hr2 - this.hr1;
@@ -168,6 +176,7 @@ export default {
       const productCode = sanitize(this.productCode);
       const brandName = sanitize(this.brandName);
       const description = sanitize(this.description);
+      const countryOfOrigin = sanitize(this.countryOfOrigin);
       const itemSize = sanitize(this.itemSize);
       const quantity = this.quantity || 1;
       const shelf = sanitize(this.shelf);
@@ -265,6 +274,11 @@ export default {
         description: {
           maxWidth: this.width - this.hm * 2,
         },
+        countryOfOrigin: {
+          minFontSize: 36,
+          maxFontSize: 36,
+          maxWidth: this.width - this.hm * 2,
+        },
         retailPriceText: {
           maxWidth: this.width - this.vr2 - this.hm * 2,
         },
@@ -283,6 +297,7 @@ export default {
         productCodeText,
         brandName,
         description,
+        countryOfOrigin,
         itemSize,
         itemSizeText,
         retailPrice,
@@ -362,6 +377,9 @@ export default {
       );
 
       metrics.description.top = Math.round(this.hr2 + this.vr3gap);
+      metrics.countryOfOrigin.top = Math.round(
+        this.height - metrics.countryOfOrigin.height - Math.round(this.vm / 2)
+      );
 
       metrics.unitCostText.top = Math.round(
         this.hr1 - this.vr1gap - metrics.unitCostText.height
@@ -371,7 +389,7 @@ export default {
         this.hr1 -
           this.vr1gap -
           metrics.unitCostText.height -
-          this.vr1gap -
+          this.linegap -
           metrics.itemSizeText.height
       );
 
@@ -463,6 +481,7 @@ export default {
         productCodeText,
         brandName,
         description,
+        countryOfOrigin,
         itemSizeText,
         unitCostText,
         retailPriceText,
@@ -515,13 +534,13 @@ export default {
 ^FX barcode ^FS
 ^FO${this.hm},0
 ^BY3
-^BCN,90,N,,,A
+^BCN,${metrics.productCodeText.top - Math.round(this.vm / 2)},N,,,A
 ^FD${productCode}
 ^FS
 
 ^FX product code ^FS
-^FO0,${metrics.productCodeText.top}
-^FB${this.vr2},2,,C,
+^FO${this.hm},${metrics.productCodeText.top}
+^FB${this.vr2},2,,L,
 ^A0,${metrics.productCodeText.fontSize}
 ^FD${productCodeText}\\&
 ^FS
@@ -570,6 +589,13 @@ ${retailPriceSubtextZpl}
 ^FD${description}\\&
 ^FS
 
+^FX text2 ^FS
+^FO0,${metrics.countryOfOrigin.top}
+^FB${this.width},2,,C,
+^A0,${metrics.countryOfOrigin.fontSize}
+^FD${countryOfOrigin}\\&
+^FS
+
 ${isOrganicZpl}
 
 ${backgroundZpl}
@@ -583,6 +609,7 @@ ${backgroundZpl}
         productCodeText,
         brandName,
         description,
+        countryOfOrigin,
         retailPriceText,
         itemSizeText,
         unitCostText,
@@ -708,6 +735,18 @@ ${backgroundZpl}
 
       ctx.font = this.createFont(metrics.description.fontSize);
       ctx.fillText(description, this.width / 2, metrics.description.top);
+
+      // COUNTRY OF ORIGIN
+
+      ctx.textBaseline = "top";
+      ctx.textAlign = "center";
+
+      ctx.font = this.createFont(metrics.countryOfOrigin.fontSize);
+      ctx.fillText(
+        countryOfOrigin,
+        this.width / 2,
+        metrics.countryOfOrigin.top
+      );
 
       ctx.restore();
 

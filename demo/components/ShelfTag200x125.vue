@@ -7,6 +7,7 @@
           :productCode="productCode"
           :brandName="brandName"
           :description="description"
+          :countryOfOrigin="countryOfOrigin"
           :retailPrice="retailPrice"
           :quantity="quantity"
           :itemSize="itemSize"
@@ -46,6 +47,9 @@
         </div>
         <div>
           <input class="text-base font-sans" v-model.trim="description" />
+        </div>
+        <div>
+          <input class="text-base font-sans" v-model.trim="countryOfOrigin" />
         </div>
         <div>
           <input class="text-base font-sans" v-model.trim="itemSize" />
@@ -139,6 +143,7 @@ export default {
       productCode: "015532000039",
       brandName: "Montebello",
       description: "Spinach Fettuccini",
+      countryOfOrigin: "Italy",
       retailPrice: 4.79,
       itemSize: "12 OZ",
       quantity: 1,
