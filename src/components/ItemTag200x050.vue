@@ -157,6 +157,7 @@ export default {
             .replace(/[j]/g, "i")
             .replace(/[$]/g, "S")
             .replace(/[@]/g, "W")
+            .replace(/[&]/g, "S")
             .replace(/[^a-zA-Z0-9 ]/g, ".");
           ctx.font = this.createFont(fontSize);
           metrics = ctx.measureText(testValue);
