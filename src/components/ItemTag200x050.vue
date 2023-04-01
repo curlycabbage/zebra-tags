@@ -302,7 +302,7 @@ export default {
 ^LL${this.height}
 
 ^FX barcode ^FS
-^FO${this.width - this.hm},0,1
+^FO${this.width - this.hm * 1.5},0,1
 ^BY3
 ^BCN,70,N,,,A
 ^FD${productCode}
@@ -317,14 +317,14 @@ export default {
 
 ^FX text1 ^FS
 ^FO${this.hm},${metrics.brandName.top}
-^FB${this.vr1},2,,L,
+^FB${this.vr1},1,,L,
 ^A0,${metrics.brandName.fontSize}
 ^FD${brandName.replace("\n", "\\&")}\\&
 ^FS
 
 ^FX text2 ^FS
 ^FO${this.hm},${metrics.description.top}
-^FB${this.width},2,,L,
+^FB${this.width},1,,L,
 ^A0,${metrics.description.fontSize}
 ^FD${description}\\&
 ^FS
