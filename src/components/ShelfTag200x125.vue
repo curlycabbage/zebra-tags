@@ -365,7 +365,7 @@ export default {
 
       metrics.productCodeText.top = Math.round(
         // this.hr1 - this.vr1gap - metrics.productCodeText.height
-        this.vm
+        Math.round(this.vm / 2)
       );
 
       metrics.shelf.top = this.vm / 2;
