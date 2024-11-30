@@ -114,6 +114,11 @@ export default {
       return Math.round(this.inch.height * this.dpi);
     },
 
+    /** barcode top */
+    bct() {
+      return Math.round((13 / 96) * this.dpi);
+    },
+
     /** horizontal rule 1 */
     hr1() {
       return Math.round((40 / 96) * this.dpi);
@@ -535,12 +540,9 @@ export default {
 
 
 ^FX barcode ^FS
-^FO${this.hm},${metrics.productCodeText.top + metrics.productCodeText.height}
+^FO${this.hm},${this.bct}
 ^BY3
-^BCN,${
-        this.hr1 -
-        (metrics.productCodeText.top + metrics.productCodeText.height)
-      },N,,,A
+^BCN,${this.hr1 - this.bct},N,,,A
 ^FD${productCode}
 ^FS
 
