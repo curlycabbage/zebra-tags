@@ -5,7 +5,7 @@ A Vue.js 2 component library for printing tags with ZPL.
 ## standalone demo
 
 `
-npm run demo
+npm run serve
 `npm 
 
 ## publishing

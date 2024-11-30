@@ -364,7 +364,8 @@ export default {
       }
 
       metrics.productCodeText.top = Math.round(
-        this.hr1 - this.vr1gap - metrics.productCodeText.height
+        // this.hr1 - this.vr1gap - metrics.productCodeText.height
+        this.vm
       );
 
       metrics.shelf.top = this.vm / 2;
@@ -532,10 +533,14 @@ export default {
 ^FO0,${this.hr1}^GB${this.width},${this.lineWidth},${this.lineWidth}^FS
 ^FO0,${this.hr2}^GB${this.width},${this.lineWidth},${this.lineWidth}^FS
 
+
 ^FX barcode ^FS
-^FO${this.hm},0
+^FO${this.hm},${metrics.productCodeText.top + metrics.productCodeText.height}
 ^BY3
-^BCN,${metrics.productCodeText.top - Math.round(this.vm / 2)},N,,,A
+^BCN,${
+        this.hr1 -
+        (metrics.productCodeText.top + metrics.productCodeText.height)
+      },N,,,A
 ^FD${productCode}
 ^FS
 
